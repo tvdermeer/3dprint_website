@@ -33,6 +33,7 @@ class OrderService:
             customer_name=order.customer_name,
             total_amount=order.total_amount,
             status=order.status,
+            stripe_payment_id=order.stripe_payment_id,
         )
         db.add(db_order)
         db.flush()  # Flush to get the ID for the order
@@ -106,3 +107,15 @@ class OrderService:
     def get_all_orders(db: Session, skip: int = 0, limit: int = 100) -> list[Order]:
         """Get all orders with pagination."""
         return db.query(Order).order_by(Order.created_at.desc()).offset(skip).limit(limit).all()
+
+    @staticmethod
+    def update_order_status_by_payment_id(db: Session, payment_id: str, new_status: str) -> Optional[Order]:
+        """Update order status by Stripe payment ID."""
+        db_order = db.query(Order).filter(Order.stripe_payment_id == payment_id).first()
+        if not db_order:
+            return None
+
+        db_order.status = new_status
+        db.commit()
+        db.refresh(db_order)
+        return db_order

@@ -47,6 +47,7 @@ class OrderCreate(OrderBase):
 
     status: str = Field(default="pending", description="Initial order status")
     items: List[OrderItemCreate] = Field(..., description="List of items in the order")
+    stripe_payment_id: Optional[str] = Field(None, description="Stripe payment intent ID")
 
 
 class OrderUpdate(BaseModel):
