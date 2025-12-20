@@ -72,7 +72,8 @@ backend/
 - [x] Test API endpoints (Unit & E2E)
 - [x] Setup frontend to communicate with backend
 - [x] Frontend Authentication (Login/Register UI)
-- [ ] Stripe Payment Integration
+- [x] Stripe Payment Integration (Backend)
+- [ ] Stripe Payment Integration (Frontend)
 
 ## Files Created
 
