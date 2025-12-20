@@ -23,7 +23,9 @@
 @layer components {
   /* Updated button styles for a more modern look */
   .btn {
-    @apply inline-flex items-center justify-center px-8 py-3 font-medium transition-all duration-200 cursor-pointer;
+    /* @apply inline-flex items-center justify-center px-8 py-3 font-medium transition-all duration-200 cursor-pointer; */
+    @apply inline-flex items-center justify-center px-8 py-3 font-semibold transition-all duration-200 cursor-pointer text-sm uppercase tracking-widest;
+
   }
 
   .btn-primary {
