@@ -10,8 +10,8 @@ The project has been successfully implemented with a decoupled architecture feat
 ### 1. Backend (FastAPI)
 - **Architecture**: Service-repository pattern with Dependency Injection.
 - **Database**: SQLite with SQLAlchemy ORM (extensible to PostgreSQL).
-- **API**: RESTful API with 23 endpoints covering Products, Orders, and Health checks.
-- **Testing**: 100% pass rate on core functional tests (Products, Orders, Health).
+- **API**: RESTful API with 25 endpoints covering Products, Orders, Users, Auth and Health checks.
+- **Testing**: 100% pass rate on core functional tests + E2E Critical Path.
 - **Tooling**: Managed via `uv` for modern Python package management.
 - **Documentation**: Auto-generated Swagger UI and ReDoc.
 

@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 const LandingPage = () => import('../views/LandingPage.vue')
 const ProductPage = () => import('../views/ProductPage.vue')
 const CheckoutPage = () => import('../views/CheckoutPage.vue')
+const AuthPage = () => import('../views/AuthPage.vue')
 
 const routes = [
   {
@@ -20,6 +21,11 @@ const routes = [
     path: '/checkout',
     name: 'Checkout',
     component: CheckoutPage,
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: AuthPage,
   },
 ]
 

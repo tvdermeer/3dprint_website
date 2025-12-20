@@ -40,6 +40,28 @@ async function apiFetch(endpoint, options = {}) {
   }
 }
 
+// Auth API
+export const authApi = {
+  login: (email, password) => {
+    const formData = new URLSearchParams();
+    formData.append('username', email);
+    formData.append('password', password);
+    
+    return apiFetch('/auth/login/access-token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: formData,
+    });
+  },
+
+  signup: (userData) => apiFetch('/auth/signup', {
+    method: 'POST',
+    body: JSON.stringify(userData),
+  }),
+};
+
 // Products API
 export const productsApi = {
   getAll: (params) => {

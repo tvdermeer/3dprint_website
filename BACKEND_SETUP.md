@@ -66,11 +66,13 @@ backend/
 - [x] Product endpoints (GET, POST, PUT, DELETE, stock check)
 - [x] Order endpoints (GET, POST, PUT, status updates, payment processing)
 - [x] Health check endpoints
-- [ ] Authentication endpoints (planned for Phase 4)
+- [x] Authentication endpoints (Login/Signup)
 
-### 📋 Phase 4: Integration (Next)
-- [ ] Test API endpoints
-- [ ] Setup frontend to communicate with backend
+### 📋 Phase 4: Integration
+- [x] Test API endpoints (Unit & E2E)
+- [x] Setup frontend to communicate with backend
+- [x] Frontend Authentication (Login/Register UI)
+- [ ] Stripe Payment Integration
 
 ## Files Created
 

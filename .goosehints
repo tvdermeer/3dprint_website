@@ -264,6 +264,11 @@ development_workflow: |
      - Runs Alembic to apply pending migrations
      - Use: alembic revision --autogenerate -m "description"
      - Migrations are version-controlled and committed to git
+  
+  6. VERSION CONTROL:
+     - Commit changes after finishing each implementation phase
+     - Use meaningful commit messages describing the feature or fix
+     - Ensure tests pass before committing (checked by pre-commit hooks)
 
 ## ============================================================================
 ## ENVIRONMENT MANAGEMENT
