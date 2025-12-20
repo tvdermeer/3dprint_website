@@ -1,0 +1,54 @@
+---
+# Goose Recipe: Database Migrations
+# Description: Manage database schema changes with Alembic
+# Usage: goose run db-migrate
+
+title: Database Migrations (Alembic)
+description: Apply, create, and manage database schema migrations
+
+steps:
+  - name: Check current database status
+    description: Show current migration revision and status
+    command: |
+      cd backend
+      echo "Current database revision:"
+      alembic current
+      echo ""
+      echo "Migration history:"
+      alembic history --verbose | head -20
+      cd ..
+
+  - name: Apply pending migrations
+    description: Upgrade database schema to the latest revision
+    command: |
+      cd backend
+      echo "Applying pending migrations..."
+      alembic upgrade head
+      cd ..
+
+  - name: Verify migration success
+    description: Confirm all migrations have been applied
+    command: |
+      cd backend
+      echo "Current database revision after upgrade:"
+      alembic current
+      cd ..
+
+  - name: Migration Instructions
+    description: Display instructions for creating new migrations
+    command: |
+      echo ""
+      echo "========================================"
+      echo "✓ Database migration completed!"
+      echo "========================================"
+      echo ""
+      echo "TO CREATE A NEW MIGRATION:"
+      echo "  1. Make changes to models in app/models/"
+      echo "  2. Run: cd backend && alembic revision --autogenerate -m \"Description\""
+      echo "  3. Review the generated migration file in migrations/versions/"
+      echo "  4. Run: goose run db-migrate (to apply)"
+      echo ""
+      echo "TO DOWNGRADE (revert last migration):"
+      echo "  cd backend && alembic downgrade -1"
+      echo ""
+      echo "All migrations are version-controlled in git"

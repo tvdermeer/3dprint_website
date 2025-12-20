@@ -1,0 +1,52 @@
+---
+# Goose Recipe: Initial Development Setup
+# Description: Installs all dependencies for frontend and backend
+# Usage: goose run dev-setup
+
+title: Initial Development Setup
+description: Install all dependencies for frontend and backend services
+
+steps:
+  - name: Install Node.js dependencies (Frontend)
+    description: Install npm packages for Vue 3 + Vite frontend
+    command: |
+      cd frontend
+      npm install
+      cd ..
+
+  - name: Install Python dependencies (Backend)
+    description: Install Python packages for FastAPI backend
+    command: |
+      cd backend
+      pip install -r requirements.txt
+      cd ..
+
+  - name: Initialize database with migrations
+    description: Create database and apply Alembic migrations
+    command: |
+      cd backend
+      alembic upgrade head
+      cd ..
+
+  - name: Setup environment files
+    description: Check if .env file exists, show instructions if not
+    command: |
+      if [ ! -f .env ]; then
+        echo "⚠️  .env file not found"
+        echo "Creating .env from .env.example"
+        cp .env.example .env
+        echo "✓ .env file created - update with your actual secrets"
+      else
+        echo "✓ .env file already exists"
+      fi
+
+  - name: Verify installations
+    description: Check that both frontend and backend are properly installed
+    command: |
+      echo "=== Frontend Version Check ==="
+      cd frontend && npm --version && cd ..
+      
+      echo "=== Backend Version Check ==="
+      cd backend && python --version && cd ..
+      
+      echo "✓ Setup complete! Run 'goose run docker-compose-up' to start development"

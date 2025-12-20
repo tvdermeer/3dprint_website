@@ -1,0 +1,493 @@
+# E-Commerce Monorepo Project Structure & Configuration
+
+I'll create a comprehensive `.goosehints` file that documents your project structure, technology choices, and best practices for this e-commerce platform.
+
+```yaml
+# .goosehints
+# E-Commerce Monorepo Project Configuration
+# Last Updated: 2025-12-20
+
+project:
+  name: E-Commerce Platform
+  description: Single-product e-commerce website with Vue 3 frontend and FastAPI backend
+  type: monorepo
+  created_at: 2025-12-20
+
+## ============================================================================
+## TECHNOLOGY STACK
+## ============================================================================
+
+stack:
+  frontend:
+    framework: Vue 3
+    build_tool: Vite
+    description: |
+      Vue 3 with Vite provides a modern, fast development experience with HMR (Hot Module Replacement).
+      Vite bundles efficiently for production with minimal configuration.
+    rationale: |
+      - Fast development server startup and HMR
+      - Optimized production builds with tree-shaking
+      - Native ES modules support
+      - Excellent Vue 3 integration
+
+  state_management:
+    library: Pinia
+    description: |
+      Pinia is the official state management solution for Vue 3, replacing Vuex.
+      It provides a simpler, more intuitive API with better TypeScript support.
+    rationale: |
+      - Official Vue 3 state management
+      - Simpler API than Vuex
+      - Better TypeScript support
+      - DevTools integration for debugging
+      - Modular store architecture
+
+  testing_frontend:
+    framework: Vitest
+    description: |
+      Vitest is a unit test framework optimized for Vite projects.
+      Runs tests with similar speed to Vite's development server.
+    rationale: |
+      - Native Vite integration (same config, same speed)
+      - Drop-in replacement for Jest
+      - Great Vue 3 component testing support
+      - Instant test feedback during development
+
+  backend:
+    framework: FastAPI
+    description: |
+      FastAPI is a modern, fast Python web framework for building APIs.
+      Built on Starlette and Pydantic for automatic validation and documentation.
+    rationale: |
+      - Automatic OpenAPI/Swagger documentation
+      - Built-in request validation with Pydantic
+      - Async/await support for high performance
+      - Excellent type hints integration
+      - Modern Python best practices
+
+  database:
+    type: SQLite
+    orm: SQLAlchemy
+    migrations: Alembic
+    description: |
+      SQLite provides a lightweight, file-based database perfect for development and single-product
+      storefronts. SQLAlchemy offers a robust ORM with database-agnostic queries.
+      Alembic handles schema versioning and migrations.
+    rationale: |
+      - SQLite: Zero-configuration, file-based, perfect for development and small deployments
+      - SQLAlchemy: Industry-standard ORM, easy to migrate to PostgreSQL later
+      - Alembic: Version-controlled migrations, team collaboration friendly
+      - No external database service needed for development
+
+  authentication:
+    method: JWT (JSON Web Tokens)
+    description: |
+      JWT-based stateless authentication. Tokens contain user claims and are verified on each request.
+      Ideal for decoupled frontend-backend architectures.
+    rationale: |
+      - Stateless: No session storage required
+      - Decoupled: Frontend can be deployed separately
+      - Scalable: Works well with multiple backend instances
+      - Standard: Widely supported and understood
+      - Secure: Use HS256 or RS256 algorithms
+
+  payment_processing:
+    provider: Stripe API
+    description: |
+      Stripe handles payment processing, PCI compliance, and webhook handling.
+      Backend integrates with Stripe API for secure transaction processing.
+    rationale: |
+      - PCI compliant (offloads security responsibility)
+      - Webhook support for async payment updates
+      - Multiple payment methods (cards, Apple Pay, Google Pay, etc.)
+      - Excellent documentation and SDK
+      - Industry standard for e-commerce
+
+  containerization:
+    technology: Docker & Docker Compose
+    scope: Local development only
+    description: |
+      Docker containerizes both frontend and backend services.
+      Docker Compose orchestrates local development environment.
+      No production deployment on VPS yet - running locally.
+    rationale: |
+      - Consistent development environment across team
+      - Easy dependency isolation
+      - Reproducible builds
+      - Foundation for future production deployments
+
+## ============================================================================
+## PROJECT STRUCTURE
+## ============================================================================
+
+directory_structure: |
+  your-ecommerce-monorepo/
+  │
+  ├── frontend/                          # Vue 3 + Vite SPA
+  │   ├── src/
+  │   │   ├── components/                # Reusable Vue components
+  │   │   ├── views/                     # Page-level components (routes)
+  │   │   ├── stores/                    # Pinia stores (state management)
+  │   │   ├── api/                       # API client/services
+  │   │   ├── router/                    # Vue Router configuration
+  │   │   ├── assets/                    # Static assets (images, fonts, etc.)
+  │   │   ├── utils/                     # Utility functions
+  │   │   ├── types/                     # TypeScript type definitions
+  │   │   ├── App.vue
+  │   │   └── main.ts
+  │   ├── public/
+  │   ├── tests/                         # Vitest test files (mirror src structure)
+  │   ├── vite.config.ts                 # Vite configuration
+  │   ├── vitest.config.ts               # Vitest configuration
+  │   ├── tsconfig.json                  # TypeScript configuration
+  │   ├── package.json
+  │   ├── .env.example                   # Example environment variables
+  │   └── dockerfile                     # Docker image for frontend
+  │
+  ├── backend/                           # FastAPI + SQLAlchemy
+  │   ├── app/
+  │   │   ├── api/
+  │   │   │   ├── v1/
+  │   │   │   │   ├── endpoints/         # Route handlers (products, orders, etc.)
+  │   │   │   │   ├── dependencies.py    # Dependency injection
+  │   │   │   │   └── __init__.py
+  │   │   │   └── __init__.py
+  │   │   ├── models/                    # SQLAlchemy ORM models (database schema)
+  │   │   ├── schemas/                   # Pydantic schemas (request/response validation)
+  │   │   ├── services/                  # Business logic (payment, orders, etc.)
+  │   │   ├── core/
+  │   │   │   ├── config.py              # Configuration and environment variables
+  │   │   │   ├── security.py            # JWT and authentication logic
+  │   │   │   └── database.py            # Database connection and session
+  │   │   ├── utils/                     # Utility functions
+  │   │   ├── main.py                    # FastAPI app instantiation
+  │   │   └── __init__.py
+  │   ├── migrations/                    # Alembic migration files (version-controlled schema changes)
+  │   ├── tests/                         # pytest test files (mirror app structure)
+  │   ├── alembic.ini                    # Alembic configuration
+  │   ├── requirements.txt                # Python dependencies
+  │   ├── pyproject.toml                 # Python project metadata and tools config
+  │   ├── .env.example                   # Example environment variables
+  │   ├── dockerfile                     # Docker image for backend
+  │   └── .gitignore
+  │
+  ├── goose-recipes/                     # Goose automation recipes
+  │   ├── dev-setup.yml                  # Initial setup and dependency installation
+  │   ├── run-tests.yml                  # Run Vitest + pytest
+  │   ├── run-linters.yml                # Run code quality checks (ESLint, Flake8, Black, mypy)
+  │   ├── db-migrate.yml                 # Run Alembic migrations
+  │   └── docker-compose-up.yml          # Start local development environment
+  │
+  ├── docker-compose.yml                 # Local development orchestration
+  ├── .env.example                       # Example root environment variables
+  ├── .env                               # Actual environment variables (git-ignored)
+  ├── .pre-commit-config.yaml            # Git pre-commit hooks configuration
+  ├── .gitignore                         # Git ignore rules
+  └── README.md                          # Project documentation
+
+## ============================================================================
+## KEY ARCHITECTURAL DECISIONS
+## ============================================================================
+
+architecture:
+  monorepo_rationale: |
+    - Single repository for frontend and backend simplifies:
+      * Coordinated releases and version management
+      * Shared CI/CD pipelines
+      * Easier atomic commits across services
+      * Shared documentation and issues
+    - Monorepo tools (Turborepo, Nx) can be added later if needed
+    - Easy to split into separate repos in the future
+
+  api_design: |
+    - FastAPI handles all business logic and database access
+    - Frontend communicates exclusively through REST API
+    - Decoupled architecture allows independent deployment
+    - API versioning (v1) enables future backward compatibility
+
+  database_strategy: |
+    - SQLite for development: No setup required, file-based, git-friendly
+    - SQLAlchemy ORM allows easy migration to PostgreSQL for production
+    - Alembic migrations version-control schema changes
+    - Future: Can migrate to PostgreSQL without code changes (mostly)
+
+  authentication_flow: |
+    1. User submits credentials to /api/v1/auth/login endpoint
+    2. Backend validates credentials, generates JWT token
+    3. Frontend stores JWT in localStorage or sessionStorage
+    4. Frontend includes JWT in Authorization header for subsequent requests
+    5. Backend validates JWT signature and expiration on each request
+    6. User info extracted from JWT claims (no database lookup needed)
+
+  payment_flow: |
+    1. Frontend sends product details to backend
+    2. Backend creates Stripe PaymentIntent via Stripe API
+    3. Frontend receives clientSecret, initializes Stripe.js
+    4. User completes payment in Stripe-hosted form
+    5. Stripe sends webhook to backend with payment confirmation
+    6. Backend updates order status in database
+    7. Frontend polls or uses WebSocket for real-time status updates
+
+## ============================================================================
+## DEVELOPMENT WORKFLOW
+## ============================================================================
+
+development_workflow: |
+  1. SETUP (One-time):
+     $ goose run dev-setup
+     - Installs Node dependencies (frontend)
+     - Installs Python dependencies (backend)
+     - Initializes database with migrations
+
+  2. DEVELOPMENT:
+     $ goose run docker-compose-up
+     - Starts backend on http://localhost:8000
+     - Starts frontend on http://localhost:5173
+     - Both services watch for file changes (HMR enabled)
+
+  3. TESTING (Pre-commit automatic, or manual):
+     $ goose run run-tests
+     - Runs Vitest for frontend components
+     - Runs pytest for backend logic
+     - Pre-commit hook prevents commits if tests fail
+
+  4. CODE QUALITY:
+     $ goose run run-linters
+     - ESLint checks Vue/TypeScript code style
+     - Black formats Python code
+     - Flake8 checks Python style
+     - mypy performs static type checking on Python
+     - Pre-commit hook prevents commits if linters fail
+
+  5. DATABASE CHANGES:
+     $ goose run db-migrate
+     - Runs Alembic to apply pending migrations
+     - Use: alembic revision --autogenerate -m "description"
+     - Migrations are version-controlled and committed to git
+
+## ============================================================================
+## ENVIRONMENT MANAGEMENT
+## ============================================================================
+
+environment_variables: |
+  Location: .env (root level, git-ignored)
+  Structure: Simple key=value pairs
+  
+  BACKEND VARIABLES:
+    - SECRET_KEY: JWT signing secret (change in production)
+    - DATABASE_URL: SQLAlchemy connection string
+    - STRIPE_SECRET_KEY: Stripe API secret key
+    - STRIPE_PUBLISHABLE_KEY: Stripe public key (for frontend)
+  
+  FRONTEND VARIABLES:
+    - VITE_API_URL: Backend API URL (http://localhost:8000 for dev)
+  
+  Note: Use .env.example as template
+  Note: Different DTAP configs will be added later if needed
+
+## ============================================================================
+## TESTING STRATEGY
+## ============================================================================
+
+testing: |
+  FRONTEND (Vitest):
+    - Unit tests for Vue components
+    - Unit tests for Pinia stores
+    - Unit tests for utility functions
+    - Test files: src/**/*.test.ts or src/**/*.spec.ts
+    - Run via: npm run test
+  
+  BACKEND (pytest):
+    - Unit tests for services and utilities
+    - Integration tests for API endpoints
+    - Database fixture setup for tests
+    - Test files: tests/**/*.py
+    - Run via: pytest
+  
+  PRE-COMMIT INTEGRATION:
+    - Tests run automatically before git commit
+    - Commit blocked if tests fail
+    - Ensures code quality gate
+
+## ============================================================================
+## CODE QUALITY & LINTING
+## ============================================================================
+
+code_quality: |
+  FRONTEND:
+    - ESLint: Style and error checking for Vue/TypeScript
+    - Prettier (via Vite): Code formatting consistency
+    - TypeScript: Static type checking
+    - Pre-commit hook: Prevents commits with linting errors
+  
+  BACKEND:
+    - Black: Python code formatter (PEP 8 compliant)
+    - Flake8: Python style checker
+    - mypy: Python static type checker (strict mode)
+    - Pre-commit hook: Prevents commits with linting errors
+  
+  Run via: goose run run-linters
+
+## ============================================================================
+## CONTAINERIZATION APPROACH
+## ============================================================================
+
+docker_strategy: |
+  PURPOSE:
+    - Consistent development environment for all team members
+    - Dependency isolation
+    - Foundation for future production deployment
+  
+  CURRENT SCOPE:
+    - Local development only via docker-compose up
+    - No VPS/production deployment yet
+    - Database persisted to local file (ecommerce.db)
+  
+  SERVICES:
+    - Backend: FastAPI server on port 8000
+    - Frontend: Vite dev server on port 5173
+    - Both services watch for file changes (development mode)
+  
+  FUTURE ENHANCEMENTS:
+    - Production-ready builds (optimized Dockerfiles)
+    - Database service (PostgreSQL) in compose
+    - Nginx reverse proxy
+    - CI/CD deployment pipeline
+    - Environment-specific configs (dev/staging/prod)
+
+## ============================================================================
+## SECURITY CONSIDERATIONS
+## ============================================================================
+
+security: |
+  AUTHENTICATION:
+    - JWT tokens for stateless authentication
+    - Tokens signed with SECRET_KEY (change per environment)
+    - Token expiration enforced (typically 1 hour)
+    - Refresh tokens for extended sessions
+  
+  PAYMENT:
+    - Never store raw credit card data (Stripe handles this)
+    - Stripe API calls use server-side secret keys
+    - Webhook validation ensures Stripe origin
+    - HTTPS required in production
+  
+  ENVIRONMENT VARIABLES:
+    - .env file is git-ignored (never committed)
+    - Different secrets per environment
+    - SECRET_KEY must be randomly generated in production
+  
+  CORS:
+    - Configure FastAPI CORS to allow frontend origin
+    - Restrict to specific domains in production
+  
+  DATABASE:
+    - SQLite is file-based (not ideal for production at scale)
+    - Migrate to PostgreSQL for production
+    - Use SQLAlchemy ORM to prevent SQL injection
+
+## ============================================================================
+## FUTURE CONSIDERATIONS
+## ============================================================================
+
+future_enhancements: |
+  NEAR TERM:
+    - Add background tasks (Celery/Dramatiq for order processing)
+    - Email notifications (SendGrid/Mailgun integration)
+    - Inventory management
+    - Product image optimization and CDN
+  
+  MEDIUM TERM:
+    - DTAP environment configs (development/testing/acceptance/production)
+    - Production deployment (AWS, Railway, Render, etc.)
+    - Database migration to PostgreSQL
+    - Caching layer (Redis)
+    - CDN for static assets
+  
+  LONG TERM:
+    - Multiple product support
+    - Advanced analytics and reporting
+    - Multi-currency and international shipping
+    - Subscription management
+    - Admin dashboard (separate Vue app)
+    - Mobile app (React Native/Flutter)
+
+## ============================================================================
+## USEFUL COMMANDS
+## ============================================================================
+
+commands: |
+  GOOSE RECIPES:
+    $ goose run dev-setup              # Install all dependencies
+    $ goose run docker-compose-up      # Start local development environment
+    $ goose run run-tests              # Run all tests
+    $ goose run run-linters            # Run all linters and formatters
+    $ goose run db-migrate             # Run Alembic migrations
+  
+  MANUAL COMMANDS:
+    # Frontend
+    $ cd frontend && npm install       # Install dependencies
+    $ npm run dev                      # Start Vite dev server
+    $ npm run test                     # Run Vitest
+    $ npm run build                    # Build for production
+  
+    # Backend
+    $ cd backend && pip install -r requirements.txt  # Install dependencies
+    $ uvicorn app.main:app --reload   # Start FastAPI dev server
+    $ pytest                           # Run tests
+    $ alembic upgrade head             # Apply migrations
+    $ alembic revision --autogenerate -m "description"  # Create migration
+  
+    # Docker
+    $ docker-compose up                # Start all services
+    $ docker-compose down              # Stop all services
+    $ docker-compose logs -f           # View logs
+
+## ============================================================================
+## REFERENCES & RESOURCES
+## ============================================================================
+
+resources: |
+  FRONTEND:
+    - Vue 3 Docs: https://vuejs.org/
+    - Vite Docs: https://vitejs.dev/
+    - Pinia Docs: https://pinia.vuejs.org/
+    - Vitest Docs: https://vitest.dev/
+  
+  BACKEND:
+    - FastAPI Docs: https://fastapi.tiangolo.com/
+    - SQLAlchemy Docs: https://docs.sqlalchemy.org/
+    - Alembic Docs: https://alembic.sqlalchemy.org/
+    - Pydantic Docs: https://docs.pydantic.dev/
+  
+  PAYMENT:
+    - Stripe Documentation: https://stripe.com/docs
+    - Stripe API Reference: https://stripe.com/docs/api
+  
+  TOOLS:
+    - Docker: https://docs.docker.com/
+    - Pre-commit: https://pre-commit.com/
+    - Goose: (this project!)
+
+```
+
+---
+
+## Summary
+
+This `.goosehints` file serves as:
+
+1. **Project Knowledge Base** - Documents all technology choices and their rationale
+2. **Onboarding Guide** - New developers understand the architecture and workflow
+3. **Decision Reference** - Explains why each technology was chosen
+4. **Future Roadmap** - Outlines planned enhancements and scalability considerations
+5. **Best Practices** - Captures the development workflow and conventions
+
+The file is organized into logical sections covering stack, structure, architecture, workflow, security, and future plans. It's human-readable and can be updated as the project evolves.
+
+Would you like me to now create the actual **Goose recipe files** for automation? I can create:
+- `dev-setup.yml`
+- `run-tests.yml`
+- `run-linters.yml`
+- `db-migrate.yml`
+- `docker-compose-up.yml`

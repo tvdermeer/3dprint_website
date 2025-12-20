@@ -1,0 +1,259 @@
+# Creating Goose Recipe Files
+
+I'll create all 5 recipe files for your e-commerce project. Let me generate each one:
+
+## 1. dev-setup.yml
+```yaml
+# goose-recipes/dev-setup.yml
+# Initial setup and dependency installation
+# Run once at project start: goose run dev-setup
+
+description: Install dependencies and initialize the project
+
+steps:
+  - name: Install frontend dependencies
+    description: Install Node packages for Vue 3 + Vite
+    run: |
+      cd frontend
+      npm install
+      cd ..
+
+  - name: Install backend dependencies
+    description: Install Python packages from requirements.txt
+    run: |
+      cd backend
+      pip install -r requirements.txt
+      cd ..
+
+  - name: Setup pre-commit hooks
+    description: Install and configure git pre-commit hooks
+    run: pre-commit install
+
+  - name: Initialize database
+    description: Apply Alembic migrations to create database schema
+    run: |
+      cd backend
+      alembic upgrade head
+      cd ..
+
+  - name: Create .env file from template
+    description: Copy .env.example to .env if it doesn't exist
+    run: |
+      if [ ! -f .env ]; then
+        cp .env.example .env
+        echo "✓ Created .env file - please update with your Stripe keys"
+      else
+        echo "✓ .env file already exists"
+      fi
+
+  - name: Verify installation
+    description: Check that both services are properly installed
+    run: |
+      echo "Frontend version:"
+      cd frontend && npm -v && cd ..
+      echo "Backend version:"
+      cd backend && python --version && cd ..
+      echo "✓ Setup complete! Run 'goose run docker-compose-up' to start development"
+```
+
+## 2. run-tests.yml
+```yaml
+# goose-recipes/run-tests.yml
+# Run Vitest (frontend) and pytest (backend)
+# Usage: goose run run-tests
+
+description: Run frontend and backend tests
+
+steps:
+  - name: Run frontend tests (Vitest)
+    description: Execute Vitest for Vue components and Pinia stores
+    run: |
+      cd frontend
+      npm run test
+      cd ..
+
+  - name: Run backend tests (pytest)
+    description: Execute pytest for FastAPI endpoints and services
+    run: |
+      cd backend
+      pytest -v --cov=app --cov-report=term-missing
+      cd ..
+
+  - name: Test summary
+    description: Display test completion message
+    run: echo "✓ All tests completed successfully!"
+```
+
+## 3. run-linters.yml
+```yaml
+# goose-recipes/run-linters.yml
+# Run code quality checks and formatters
+# Usage: goose run run-linters
+
+description: Run code quality checks and formatters for both frontend and backend
+
+steps:
+  - name: Format and lint frontend code
+    description: Run ESLint and Prettier for Vue/TypeScript
+    run: |
+      cd frontend
+      echo "Running ESLint..."
+      npm run lint
+      echo "Running Prettier..."
+      npm run format
+      cd ..
+
+  - name: Format backend code with Black
+    description: Auto-format Python code to PEP 8 standards
+    run: |
+      cd backend
+      echo "Running Black formatter..."
+      black app tests
+      cd ..
+
+  - name: Lint backend code with Flake8
+    description: Check Python code style and quality
+    run: |
+      cd backend
+      echo "Running Flake8..."
+      flake8 app tests --max-line-length=100
+      cd ..
+
+  - name: Type check backend with mypy
+    description: Perform static type checking on Python code
+    run: |
+      cd backend
+      echo "Running mypy..."
+      mypy app --strict
+      cd ..
+
+  - name: Code quality summary
+    description: Display code quality check completion
+    run: echo "✓ Code quality checks completed!"
+```
+
+## 4. db-migrate.yml
+```yaml
+# goose-recipes/db-migrate.yml
+# Database migration management with Alembic
+# Usage: goose run db-migrate
+
+description: Manage database migrations with Alembic
+
+variables:
+  MIGRATION_MESSAGE: ""
+
+steps:
+  - name: Show current database version
+    description: Display current migration status
+    run: |
+      cd backend
+      echo "Current database version:"
+      alembic current
+      cd ..
+
+  - name: Show pending migrations
+    description: List migrations that haven't been applied yet
+    run: |
+      cd backend
+      echo "Pending migrations:"
+      alembic heads
+      cd ..
+
+  - name: Apply all pending migrations
+    description: Run 'alembic upgrade head' to apply all pending migrations
+    run: |
+      cd backend
+      echo "Applying migrations..."
+      alembic upgrade head
+      echo "✓ Migrations applied successfully"
+      cd ..
+
+  - name: Migration summary
+    description: Show final migration status
+    run: |
+      cd backend
+      echo "Final database version:"
+      alembic current
+      cd ..
+
+# Additional info for manual migration creation:
+# To create a new migration after changing models:
+# $ cd backend
+# $ alembic revision --autogenerate -m "description of changes"
+# $ Review the generated migration file in migrations/versions/
+# $ Run: goose run db-migrate (to apply it)
+```
+
+## 5. docker-compose-up.yml
+```yaml
+# goose-recipes/docker-compose-up.yml
+# Start local development environment with Docker Compose
+# Usage: goose run docker-compose-up
+
+description: Start frontend and backend services using Docker Compose
+
+steps:
+  - name: Check Docker installation
+    description: Verify Docker and Docker Compose are installed
+    run: |
+      echo "Checking Docker..."
+      docker --version
+      docker-compose --version
+
+  - name: Build Docker images
+    description: Build frontend and backend Docker images
+    run: |
+      echo "Building Docker images..."
+      docker-compose build
+
+  - name: Start services
+    description: Start both frontend and backend services
+    run: |
+      echo "Starting services..."
+      docker-compose up
+
+  - name: Services running
+    description: Display service URLs after startup
+    run: |
+      echo "✓ Services are running:"
+      echo "  Frontend: http://localhost:5173"
+      echo "  Backend API: http://localhost:8000"
+      echo "  API Docs: http://localhost:8000/docs"
+      echo ""
+      echo "Press Ctrl+C to stop services"
+
+# Quick commands while running:
+# - View logs: docker-compose logs -f
+# - Stop services: Ctrl+C or docker-compose down
+# - Rebuild after changes: docker-compose up --build
+```
+
+---
+
+## Summary of Recipe Files
+
+| Recipe | Purpose | Command |
+|--------|---------|---------|
+| **dev-setup.yml** | One-time project initialization | `goose run dev-setup` |
+| **run-tests.yml** | Execute Vitest + pytest | `goose run run-tests` |
+| **run-linters.yml** | Code quality & formatting | `goose run run-linters` |
+| **db-migrate.yml** | Alembic migration management | `goose run db-migrate` |
+| **docker-compose-up.yml** | Start local development | `goose run docker-compose-up` |
+
+---
+
+## Next Steps
+
+To use these recipes, you should:
+
+1. **Create the recipe files** in your `goose-recipes/` directory with the content above
+2. **Run initial setup**: `goose run dev-setup`
+3. **Start development**: `goose run docker-compose-up`
+4. **Run tests before commit**: Pre-commit hooks will automatically run tests via the hook configuration
+
+Would you like me to also help you with:
+- Creating the `.gitignore` file for the monorepo?
+- Setting up the `docker-compose.yml` configuration?
+- Creating `.pre-commit-config.yaml` with the proper hooks?
+- Setting up sample Dockerfiles for frontend and backend?

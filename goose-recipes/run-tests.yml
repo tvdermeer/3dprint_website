@@ -1,0 +1,35 @@
+---
+# Goose Recipe: Run All Tests
+# Description: Execute Vitest (frontend) and pytest (backend) test suites
+# Usage: goose run run-tests
+
+title: Run All Tests
+description: Execute frontend and backend test suites
+
+steps:
+  - name: Run Frontend Tests (Vitest)
+    description: Run Vue component and unit tests with Vitest
+    command: |
+      cd frontend
+      npm run test
+      cd ..
+
+  - name: Run Backend Tests (pytest)
+    description: Run Python unit and integration tests with pytest
+    command: |
+      cd backend
+      pytest
+      cd ..
+
+  - name: Test Summary
+    description: Display test execution summary
+    command: |
+      echo ""
+      echo "========================================"
+      echo "✓ All tests completed successfully!"
+      echo "========================================"
+      echo ""
+      echo "Frontend:  Vitest (npm run test)"
+      echo "Backend:   pytest"
+      echo ""
+      echo "Pre-commit hook will run these automatically before commits"

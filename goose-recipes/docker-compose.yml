@@ -1,0 +1,57 @@
+---
+# Goose Recipe: Start Docker Compose Development Environment
+# Description: Start all services for local development (backend, frontend)
+# Usage: goose run docker-compose-up
+
+title: Start Docker Compose Development Environment
+description: Start backend and frontend services with hot module reloading (HMR)
+
+steps:
+  - name: Verify Docker is running
+    description: Check that Docker daemon is available
+    command: |
+      docker --version || (echo "❌ Docker is not installed or running" && exit 1)
+      docker-compose --version || (echo "❌ Docker Compose is not installed" && exit 1)
+
+  - name: Verify environment file exists
+    description: Ensure .env file is configured
+    command: |
+      if [ ! -f .env ]; then
+        echo "⚠️  .env file not found"
+        echo "Creating .env from .env.example"
+        cp .env.example .env
+        echo "✓ .env file created - update with your actual configuration"
+      else
+        echo "✓ .env file exists"
+      fi
+
+  - name: Build Docker images
+    description: Build or update Docker images for services
+    command: |
+      echo "Building Docker images..."
+      docker-compose build
+
+  - name: Start services
+    description: Start all services (backend, frontend) in the foreground
+    command: |
+      echo ""
+      echo "========================================"
+      echo "🚀 Starting development environment..."
+      echo "========================================"
+      echo ""
+      echo "Services:"
+      echo "  - Backend:  http://localhost:8000"
+      echo "  - Frontend: http://localhost:5173"
+      echo "  - API Docs: http://localhost:8000/docs"
+      echo ""
+      echo "Press Ctrl+C to stop"
+      echo ""
+      docker-compose up
+
+  - name: Cleanup on exit
+    description: Stop and remove containers when exiting
+    command: |
+      echo ""
+      echo "Stopping services..."
+      docker-compose down
+      echo "✓ Services stopped"
