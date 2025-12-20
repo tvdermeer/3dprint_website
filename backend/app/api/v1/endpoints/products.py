@@ -89,10 +89,17 @@ def delete_product(product_id: int, db: Session = Depends(get_db)) -> None:
         )
 
 
+from pydantic import BaseModel, Field
+
+
+class CheckStockRequest(BaseModel):
+    quantity: int = Field(..., gt=0, description="Quantity to check")
+
+
 @router.post("/{product_id}/check-stock")
 def check_stock(
     product_id: int,
-    quantity: int,
+    request: CheckStockRequest,
     db: Session = Depends(get_db),
 ) -> dict:
     """Check if a product has sufficient stock."""
@@ -103,10 +110,10 @@ def check_stock(
             detail=f"Product with ID {product_id} not found",
         )
 
-    has_stock = ProductService.check_stock(db, product_id, quantity)
+    has_stock = ProductService.check_stock(db, product_id, request.quantity)
     return {
         "product_id": product_id,
-        "requested_quantity": quantity,
+        "requested_quantity": request.quantity,
         "available_stock": product.stock,
         "has_sufficient_stock": has_stock,
     }
