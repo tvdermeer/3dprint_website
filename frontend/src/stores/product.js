@@ -21,8 +21,8 @@ export const useProductStore = defineStore('product', () => {
     error.value = null
     try {
       const data = await productsApi.getAll({ limit: 10 })
-      // The API returns a paginated response: { items: [], total: 0, ... }
-      products.value = data.items || []
+      // The API returns a list of products directly
+      products.value = Array.isArray(data) ? data : (data.items || [])
     } catch (err) {
       console.error('Failed to fetch products:', err)
       error.value = 'Failed to load products. Please try again later.'

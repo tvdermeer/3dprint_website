@@ -4,6 +4,8 @@ import { RouterLink } from 'vue-router'
 import { Trash2, ArrowLeft, CreditCard, Lock } from 'lucide-vue-next'
 import { useCartStore } from '../stores/cart'
 
+import { computed } from 'vue'
+
 const cartStore = useCartStore()
 const step = ref('cart') // 'cart', 'payment', 'success'
 const formData = ref({
@@ -68,8 +70,6 @@ const handlePlaceOrder = async (e) => {
     alert('Failed to place order. Please try again.')
   }
 }
-
-import { computed } from 'vue'
 </script>
 
 <template>
