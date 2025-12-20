@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Trash2, ArrowLeft, CreditCard, Lock } from 'lucide-vue-next'
+import { loadStripe } from '@stripe/stripe-js'
 import { useCartStore } from '../stores/cart'
 
 import { computed } from 'vue'
@@ -14,9 +15,6 @@ const formData = ref({
   address: '',
   city: '',
   zipCode: '',
-  cardNumber: '',
-  expiryDate: '',
-  cvv: '',
 })
 
 const shippingCost = 9.99
@@ -30,44 +28,132 @@ const handleInputChange = (e) => {
   formData.value[name] = value
 }
 
-import { ordersApi } from '../api/client'
+import { ordersApi, paymentApi } from '../api/client'
+
+// Stripe Setup
+const stripe = ref(null)
+const elements = ref(null)
+const card = ref(null)
+const stripeError = ref('')
+const processing = ref(false)
+
+const initializeStripe = async () => {
+  if (!stripe.value) {
+    stripe.value = await loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  }
+  
+  if (stripe.value && step.value === 'payment' && !card.value) {
+    elements.value = stripe.value.elements()
+    
+    // Custom styling for Stripe Elements
+    const style = {
+      base: {
+        color: '#fff',
+        fontFamily: 'Inter, system-ui, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+          color: '#9ca3af'
+        }
+      },
+      invalid: {
+        color: '#ef4444',
+        iconColor: '#ef4444'
+      }
+    }
+    
+    card.value = elements.value.create('card', { style })
+    // Use nextTick to ensure the DOM element exists
+    setTimeout(() => {
+      const cardElement = document.getElementById('card-element')
+      if (cardElement) {
+        card.value.mount('#card-element')
+        
+        card.value.on('change', (event) => {
+          stripeError.value = event.error ? event.error.message : ''
+        })
+      }
+    }, 100)
+  }
+}
+
+// Watch for step changes to initialize stripe when payment step is reached
+watch(step, (newStep) => {
+  if (newStep === 'payment') {
+    initializeStripe()
+  }
+})
 
 const handlePlaceOrder = async (e) => {
   e.preventDefault()
   
+  if (processing.value) return
+  
+  processing.value = true
+  stripeError.value = ''
+  
   try {
-    // Prepare order items
-    const orderItems = cartStore.items.map(item => ({
-      product_id: item.id,
-      quantity: item.quantity,
-      price_at_purchase: item.price
-    }))
+    // 1. Create PaymentIntent
+    const { clientSecret } = await paymentApi.createIntent(finalTotal.value)
     
-    // Create order payload
-    const orderData = {
-      customer_email: formData.value.email,
-      customer_name: formData.value.name,
-      shipping_address: {
-        line1: formData.value.address,
-        city: formData.value.city,
-        postal_code: formData.value.zipCode,
-        country: 'US' // Defaulting to US for now
-      },
-      items: orderItems,
-      total_amount: finalTotal.value
+    // 2. Confirm Payment
+    const result = await stripe.value.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: card.value,
+        billing_details: {
+          name: formData.value.name,
+          email: formData.value.email,
+          address: {
+            line1: formData.value.address,
+            city: formData.value.city,
+            postal_code: formData.value.zipCode,
+            country: 'US'
+          }
+        }
+      }
+    })
+    
+    if (result.error) {
+      throw new Error(result.error.message)
     }
     
-    // Call API
-    await ordersApi.create(orderData)
-    
-    step.value = 'success'
-    setTimeout(() => {
-      cartStore.clearCart()
-    }, 3000)
+    if (result.paymentIntent.status === 'succeeded') {
+       // 3. Create Order
+      // Prepare order items
+      const orderItems = cartStore.items.map(item => ({
+        product_id: item.id,
+        quantity: item.quantity,
+        price_at_purchase: item.price
+      }))
+      
+      // Create order payload
+      const orderData = {
+        customer_email: formData.value.email,
+        customer_name: formData.value.name,
+        shipping_address: {
+          line1: formData.value.address,
+          city: formData.value.city,
+          postal_code: formData.value.zipCode,
+          country: 'US' // Defaulting to US for now
+        },
+        items: orderItems,
+        total_amount: finalTotal.value
+      }
+      
+      // Call API
+      await ordersApi.create(orderData)
+      
+      step.value = 'success'
+      setTimeout(() => {
+        cartStore.clearCart()
+      }, 3000)
+    }
     
   } catch (error) {
-    console.error('Failed to place order:', error)
-    alert('Failed to place order. Please try again.')
+    console.error('Failed to process payment:', error)
+    stripeError.value = error.message || 'Payment failed. Please try again.'
+  } finally {
+    processing.value = false
   }
 }
 </script>
@@ -244,44 +330,15 @@ const handlePlaceOrder = async (e) => {
                     </div>
                   </div>
 
-                  <div>
-                    <label class="block text-gray-400 mb-2">Card Number</label>
-                    <input
-                      type="text"
-                      name="cardNumber"
-                      v-model="formData.cardNumber"
-                      required
-                      maxlength="16"
-                      class="input"
-                      placeholder="1234 5678 9012 3456"
-                    />
+                  <div class="space-y-4">
+                    <!-- Stripe Card Element -->
+                    <div class="p-4 bg-dark-800 border border-dark-700 rounded-lg">
+                      <label class="block text-gray-400 mb-2">Card Details</label>
+                      <div id="card-element" data-testid="card-element" class="p-3 bg-dark-900 border border-dark-700 rounded-md"></div>
+                      <div v-if="stripeError" class="mt-2 text-red-500 text-sm">{{ stripeError }}</div>
+                    </div>
                   </div>
 
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-gray-400 mb-2">Expiry Date</label>
-                      <input
-                        type="text"
-                        name="expiryDate"
-                        v-model="formData.expiryDate"
-                        required
-                        class="input"
-                        placeholder="MM/YY"
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-gray-400 mb-2">CVV</label>
-                      <input
-                        type="text"
-                        name="cvv"
-                        v-model="formData.cvv"
-                        required
-                        maxlength="3"
-                        class="input"
-                        placeholder="123"
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 <div class="mt-6 p-4 bg-dark-900 border border-dark-700 flex items-center gap-2 text-sm text-gray-400">

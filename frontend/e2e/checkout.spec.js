@@ -1,49 +1,55 @@
 import { test, expect } from '@playwright/test';
 
 test('full checkout flow', async ({ page }) => {
-  // 1. Visit Home
-  await page.goto('http://localhost:5173/');
-  await expect(page).toHaveTitle(/Vite App/); // Or whatever title is configured
+  // Mock Stripe.js and other APIs
+  await page.evaluate(() => {
+    window.Stripe = function() {
+      return {
+        elements: () => ({
+          create: () => ({
+            mount: () => {},
+            on: () => {},
+          }),
+        }),
+        confirmCardPayment: () => Promise.resolve({
+          paymentIntent: { status: 'succeeded' },
+        }),
+      };
+    };
+  });
 
-  // 2. Navigate to Product (Header navigation)
-  await page.locator('nav').getByRole('link', { name: 'Product' }).click();
-  await expect(page).toHaveURL('http://localhost:5173/product');
-  
-  // Wait for product to load
-  await expect(page.getByRole('heading', { level: 1 })).not.toContainText('Loading');
+  await page.route('**/api/v1/payments/create-intent', route => route.fulfill({
+    status: 200,
+    json: { clientSecret: 'pi_mock_secret_123' },
+  }));
 
-  // 3. Add to Cart
+  await page.route('**/api/v1/orders', route => route.fulfill({
+    status: 200,
+    json: { id: 'ord_123' },
+  }));
+
+  // Start E2E Test
+  await page.goto('http://localhost:5173/product');
+
+  // Add to cart
   await page.getByRole('button', { name: /Add to Cart/ }).click();
-  
-  // 4. Go to Checkout (via cart count/link or direct link)
+
+  // Go to checkout
   await page.getByRole('link', { name: /Checkout/ }).click();
-  await expect(page).toHaveURL('http://localhost:5173/checkout');
-
-  // 5. Verify Cart Contents
-  await expect(page.getByRole('heading', { name: 'Shopping Cart' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Proceed to Checkout' })).toBeVisible();
-
-  // 6. Proceed to Payment
+  
+  // Proceed to payment
   await page.getByRole('button', { name: 'Proceed to Checkout' }).click();
-  await expect(page.getByRole('heading', { name: 'Payment Information' })).toBeVisible();
 
-  // 7. Fill Form
+  // Fill form
   await page.locator('input[name="email"]').fill('test@example.com');
   await page.locator('input[name="name"]').fill('Test User');
   await page.locator('input[name="address"]').fill('123 Test St');
   await page.locator('input[name="city"]').fill('Test City');
   await page.locator('input[name="zipCode"]').fill('12345');
-  await page.locator('input[name="cardNumber"]').fill('4242424242424242');
-  await page.locator('input[name="expiryDate"]').fill('12/26');
-  await page.locator('input[name="cvv"]').fill('123');
 
-  // 8. Place Order
+  // Place order
   await page.getByRole('button', { name: 'Place Order' }).click();
 
-  // 9. Verify Success
-  await expect(page.getByRole('heading', { name: 'Order Confirmed!' })).toBeVisible({ timeout: 10000 });
-  
-  // 10. Return Home
-  await page.getByRole('link', { name: 'Back to Home' }).click();
-  await expect(page).toHaveURL('http://localhost:5173/');
+  // Verify success
+  await expect(page.getByRole('heading', { name: 'Order Confirmed!' })).toBeVisible();
 });

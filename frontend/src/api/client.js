@@ -89,6 +89,14 @@ export const ordersApi = {
   getByNumber: (orderNumber) => apiFetch(`/orders/number/${orderNumber}`),
 };
 
+// Payment API
+export const paymentApi = {
+  createIntent: (amount, currency = 'usd') => apiFetch('/payments/create-intent', {
+    method: 'POST',
+    body: JSON.stringify({ amount, currency }),
+  }),
+};
+
 // Health Check
 export const healthApi = {
   check: () => apiFetch('/health'),
