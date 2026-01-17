@@ -159,29 +159,29 @@ const handlePlaceOrder = async (e) => {
 </script>
 
 <template>
-  <div class="min-h-screen py-16 bg-dark-900">
+  <div class="min-h-dvh py-16 bg-dark-900">
     <div class="container mx-auto">
       <div class="max-w-6xl mx-auto">
         <!-- Success Screen -->
         <div v-if="step === 'success'" class="max-w-2xl mx-auto">
           <div class="card text-center">
-            <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="size-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg class="size-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 class="text-4xl mb-4 text-white">Order Confirmed!</h1>
-            <p class="text-xl text-gray-400 mb-8">
+            <h1 class="text-4xl mb-4 text-white text-balance">Order Confirmed!</h1>
+            <p class="text-xl text-gray-400 mb-8 text-pretty">
               Thank you for your purchase. Your order has been successfully placed.
             </p>
-            <p class="text-gray-500 mb-8">
+            <p class="text-gray-500 mb-8 text-pretty">
               You will receive a confirmation email shortly with tracking information.
             </p>
             <RouterLink
               to="/"
               class="btn-primary inline-flex items-center gap-2"
             >
-              <ArrowLeft class="w-5 h-5" />
+              <ArrowLeft class="size-5" />
               Back to Home
             </RouterLink>
           </div>
@@ -190,8 +190,8 @@ const handlePlaceOrder = async (e) => {
         <!-- Empty Cart -->
         <div v-else-if="cartStore.items.length === 0" class="max-w-2xl mx-auto">
           <div class="card text-center">
-            <h1 class="text-4xl mb-4 text-white">Your Cart is Empty</h1>
-            <p class="text-xl text-gray-400 mb-8">
+            <h1 class="text-4xl mb-4 text-white text-balance">Your Cart is Empty</h1>
+            <p class="text-xl text-gray-400 mb-8 text-pretty">
               Add some items to your cart to get started.
             </p>
             <RouterLink
@@ -210,12 +210,12 @@ const handlePlaceOrder = async (e) => {
               to="/product"
               class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
-              <ArrowLeft class="w-4 h-4" />
+              <ArrowLeft class="size-4" />
               Continue Shopping
             </RouterLink>
           </div>
 
-          <h1 class="text-4xl md:text-5xl mb-8 text-white">
+          <h1 class="text-4xl md:text-5xl mb-8 text-white text-balance">
             {{ step === 'cart' ? 'Shopping Cart' : 'Checkout' }}
           </h1>
 
@@ -225,23 +225,25 @@ const handlePlaceOrder = async (e) => {
               <!-- Cart View -->
               <div v-if="step === 'cart'" class="space-y-4">
                 <div v-for="item in cartStore.items" :key="item.id" class="card flex gap-6">
-                  <div class="w-24 h-24 bg-dark-900 border border-dark-700 flex items-center justify-center flex-shrink-0">
+                  <div class="size-24 bg-dark-900 border border-dark-700 flex items-center justify-center flex-shrink-0">
                     <span class="text-gray-400 text-sm">Image</span>
                   </div>
                   <div class="flex-1">
                     <h3 class="text-xl mb-2 text-white">{{ item.name }}</h3>
-                    <p class="text-gray-400 mb-4">${{ item.price.toFixed(2) }}</p>
+                    <p class="text-gray-400 mb-4 tabular-nums">${{ item.price.toFixed(2) }}</p>
                     <div class="flex items-center gap-4">
                       <button
                         @click="cartStore.updateQuantity(item.id, item.quantity - 1)"
                         class="btn-small"
+                        aria-label="Decrease quantity"
                       >
                         -
                       </button>
-                      <span class="text-white">{{ item.quantity }}</span>
+                      <span class="text-white tabular-nums">{{ item.quantity }}</span>
                       <button
                         @click="cartStore.updateQuantity(item.id, item.quantity + 1)"
                         class="btn-small"
+                        aria-label="Increase quantity"
                       >
                         +
                       </button>
@@ -251,10 +253,11 @@ const handlePlaceOrder = async (e) => {
                     <button
                       @click="cartStore.removeFromCart(item.id)"
                       class="text-gray-400 hover:text-red-500 transition-colors"
+                      aria-label="Remove item"
                     >
-                      <Trash2 class="w-5 h-5" />
+                      <Trash2 class="size-5" />
                     </button>
-                    <p class="text-xl text-white">
+                    <p class="text-xl text-white tabular-nums">
                       ${{ (item.price * item.quantity).toFixed(2) }}
                     </p>
                   </div>
@@ -264,7 +267,7 @@ const handlePlaceOrder = async (e) => {
               <!-- Payment Form -->
               <form v-else @submit="handlePlaceOrder" class="card">
                 <h2 class="text-2xl mb-6 text-white flex items-center gap-2">
-                  <CreditCard class="w-6 h-6" />
+                  <CreditCard class="size-6" />
                   Payment Information
                 </h2>
 
@@ -342,7 +345,7 @@ const handlePlaceOrder = async (e) => {
                 </div>
 
                 <div class="mt-6 p-4 bg-dark-900 border border-dark-700 flex items-center gap-2 text-sm text-gray-400">
-                  <Lock class="w-4 h-4" />
+                  <Lock class="size-4" />
                   Your payment information is secure and encrypted
                 </div>
               </form>
@@ -356,21 +359,21 @@ const handlePlaceOrder = async (e) => {
                 <div class="space-y-3 mb-6 pb-6 border-b border-dark-700">
                   <div class="flex justify-between text-gray-400">
                     <span>Subtotal</span>
-                    <span>${{ cartStore.totalPrice.toFixed(2) }}</span>
+                    <span class="tabular-nums">${{ cartStore.totalPrice.toFixed(2) }}</span>
                   </div>
                   <div class="flex justify-between text-gray-400">
                     <span>Shipping</span>
-                    <span>${{ shippingCost.toFixed(2) }}</span>
+                    <span class="tabular-nums">${{ shippingCost.toFixed(2) }}</span>
                   </div>
                   <div class="flex justify-between text-gray-400">
                     <span>Tax</span>
-                    <span>${{ tax.toFixed(2) }}</span>
+                    <span class="tabular-nums">${{ tax.toFixed(2) }}</span>
                   </div>
                 </div>
 
                 <div class="flex justify-between text-2xl mb-6 text-white">
                   <span>Total</span>
-                  <span>${{ finalTotal.toFixed(2) }}</span>
+                  <span class="tabular-nums">${{ finalTotal.toFixed(2) }}</span>
                 </div>
 
                 <button

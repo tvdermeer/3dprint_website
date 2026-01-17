@@ -4,7 +4,7 @@ import Footer from './components/Footer.vue'
 </script>
 
 <template>
-  <div id="app" class="flex flex-col min-h-screen bg-dark-900 text-primary">
+  <div id="app" class="flex flex-col min-h-dvh bg-dark-900 text-primary">
     <!-- Header (sticky) -->
     <Header />
 
@@ -18,14 +18,4 @@ import Footer from './components/Footer.vue'
   </div>
 </template>
 
-<style scoped>
-#app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
 
-main {
-  flex: 1;
-}
-</style>

@@ -17,7 +17,7 @@ const totalItems = computed(() => cartStore.totalItems)
     <div class="container flex items-center justify-between h-20">
       <!-- Logo (Left) -->
       <RouterLink to="/" class="flex items-center gap-2">
-        <div class="w-12 h-12 bg-gradient-to-br from-white/30 to-white/10 flex items-center justify-center">
+        <div class="size-12 bg-dark-800 flex items-center justify-center">
           <span class="text-white font-bold text-lg">AXYS</span>
         </div>
       </RouterLink>
@@ -45,28 +45,30 @@ const totalItems = computed(() => cartStore.totalItems)
         <!-- Auth Links -->
         <div v-if="authStore.isAuthenticated" class="flex items-center gap-4">
           <span class="text-sm text-gray-400 hidden sm:block">{{ authStore.user?.email }}</span>
-          <button @click="authStore.logout" class="text-gray-400 hover:text-white transition-colors">
-            <LogOut class="w-5 h-5" />
+          <button @click="authStore.logout" class="text-gray-400 hover:text-white transition-colors" aria-label="Logout">
+            <LogOut class="size-5" />
           </button>
         </div>
         <RouterLink
           v-else
           to="/login"
           class="text-gray-400 hover:text-white transition-colors"
+          aria-label="Login"
         >
-          <User class="w-5 h-5" />
+          <User class="size-5" />
         </RouterLink>
 
         <!-- Shopping Cart -->
         <RouterLink
           to="/checkout"
           class="relative p-2 text-gray-400 hover:text-white transition-colors duration-200"
+          aria-label="View Cart"
         >
-          <ShoppingCart class="w-6 h-6" />
+          <ShoppingCart class="size-6" />
           <!-- Cart Badge -->
           <span
             v-if="totalItems > 0"
-            class="absolute -top-1 -right-1 bg-white text-dark-900 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+            class="absolute -top-1 -right-1 bg-white text-dark-900 text-xs font-bold rounded-full size-5 flex items-center justify-center tabular-nums"
           >
             {{ totalItems }}
           </span>
