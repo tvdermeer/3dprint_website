@@ -1,13 +1,14 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed, nextTick } from 'vue'
 import { RouterLink } from 'vue-router'
 import { Trash2, ArrowLeft, CreditCard, Lock } from 'lucide-vue-next'
 import { loadStripe } from '@stripe/stripe-js'
 import { useCartStore } from '../stores/cart'
-
-import { computed } from 'vue'
+import { useThemeStore } from '../stores/theme'
+import { ordersApi, paymentApi } from '../api/client'
 
 const cartStore = useCartStore()
+const themeStore = useThemeStore()
 const step = ref('cart') // 'cart', 'payment', 'success'
 const formData = ref({
   email: '',
@@ -28,14 +29,31 @@ const handleInputChange = (e) => {
   formData.value[name] = value
 }
 
-import { ordersApi, paymentApi } from '../api/client'
-
 // Stripe Setup
 const stripe = ref(null)
 const elements = ref(null)
 const card = ref(null)
 const stripeError = ref('')
 const processing = ref(false)
+
+const getStripeStyle = () => {
+  const isDark = themeStore.theme === 'dark'
+  return {
+    base: {
+      color: isDark ? '#fff' : '#111827',
+      fontFamily: 'Inter, system-ui, sans-serif',
+      fontSmoothing: 'antialiased',
+      fontSize: '16px',
+      '::placeholder': {
+        color: isDark ? '#9ca3af' : '#6b7280'
+      }
+    },
+    invalid: {
+      color: '#ef4444',
+      iconColor: '#ef4444'
+    }
+  }
+}
 
 const initializeStripe = async () => {
   if (!stripe.value) {
@@ -45,22 +63,7 @@ const initializeStripe = async () => {
   if (stripe.value && step.value === 'payment' && !card.value) {
     elements.value = stripe.value.elements()
     
-    // Custom styling for Stripe Elements
-    const style = {
-      base: {
-        color: '#fff',
-        fontFamily: 'Inter, system-ui, sans-serif',
-        fontSmoothing: 'antialiased',
-        fontSize: '16px',
-        '::placeholder': {
-          color: '#9ca3af'
-        }
-      },
-      invalid: {
-        color: '#ef4444',
-        iconColor: '#ef4444'
-      }
-    }
+    const style = getStripeStyle()
     
     card.value = elements.value.create('card', { style })
     // Use nextTick to ensure the DOM element exists
@@ -76,6 +79,13 @@ const initializeStripe = async () => {
     }, 100)
   }
 }
+
+// Update Stripe style when theme changes
+watch(() => themeStore.theme, () => {
+  if (card.value) {
+    card.value.update({ style: getStripeStyle() })
+  }
+})
 
 // Watch for step changes to initialize stripe when payment step is reached
 watch(step, (newStep) => {
@@ -159,7 +169,7 @@ const handlePlaceOrder = async (e) => {
 </script>
 
 <template>
-  <div class="min-h-dvh py-16 bg-dark-900">
+  <div class="min-h-dvh py-16 bg-bg-main transition-colors duration-300">
     <div class="container mx-auto">
       <div class="max-w-6xl mx-auto">
         <!-- Success Screen -->
@@ -170,11 +180,11 @@ const handlePlaceOrder = async (e) => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 class="text-4xl mb-4 text-white text-balance">Order Confirmed!</h1>
-            <p class="text-xl text-gray-400 mb-8 text-pretty">
+            <h1 class="text-4xl mb-4 text-text-main text-balance">Order Confirmed!</h1>
+            <p class="text-xl text-text-muted mb-8 text-pretty">
               Thank you for your purchase. Your order has been successfully placed.
             </p>
-            <p class="text-gray-500 mb-8 text-pretty">
+            <p class="text-text-muted mb-8 text-pretty">
               You will receive a confirmation email shortly with tracking information.
             </p>
             <RouterLink
@@ -190,8 +200,8 @@ const handlePlaceOrder = async (e) => {
         <!-- Empty Cart -->
         <div v-else-if="cartStore.items.length === 0" class="max-w-2xl mx-auto">
           <div class="card text-center">
-            <h1 class="text-4xl mb-4 text-white text-balance">Your Cart is Empty</h1>
-            <p class="text-xl text-gray-400 mb-8 text-pretty">
+            <h1 class="text-4xl mb-4 text-text-main text-balance">Your Cart is Empty</h1>
+            <p class="text-xl text-text-muted mb-8 text-pretty">
               Add some items to your cart to get started.
             </p>
             <RouterLink
@@ -208,14 +218,14 @@ const handlePlaceOrder = async (e) => {
           <div class="mb-8">
             <RouterLink
               to="/product"
-              class="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              class="inline-flex items-center gap-2 text-text-muted hover:text-text-main transition-colors"
             >
               <ArrowLeft class="size-4" />
               Continue Shopping
             </RouterLink>
           </div>
 
-          <h1 class="text-4xl md:text-5xl mb-8 text-white text-balance">
+          <h1 class="text-4xl md:text-5xl mb-8 text-text-main text-balance">
             {{ step === 'cart' ? 'Shopping Cart' : 'Checkout' }}
           </h1>
 
@@ -225,24 +235,24 @@ const handlePlaceOrder = async (e) => {
               <!-- Cart View -->
               <div v-if="step === 'cart'" class="space-y-4">
                 <div v-for="item in cartStore.items" :key="item.id" class="card flex gap-6">
-                  <div class="size-24 bg-dark-900 border border-dark-700 flex items-center justify-center flex-shrink-0">
-                    <span class="text-gray-400 text-sm">Image</span>
+                  <div class="size-24 bg-bg-main border border-border-main flex items-center justify-center flex-shrink-0">
+                    <span class="text-text-muted text-sm">Image</span>
                   </div>
                   <div class="flex-1">
-                    <h3 class="text-xl mb-2 text-white">{{ item.name }}</h3>
-                    <p class="text-gray-400 mb-4 tabular-nums">${{ item.price.toFixed(2) }}</p>
+                    <h3 class="text-xl mb-2 text-text-main">{{ item.name }}</h3>
+                    <p class="text-text-muted mb-4 tabular-nums">${{ item.price.toFixed(2) }}</p>
                     <div class="flex items-center gap-4">
                       <button
                         @click="cartStore.updateQuantity(item.id, item.quantity - 1)"
-                        class="btn-small"
+                        class="btn-small text-text-main hover:text-text-muted"
                         aria-label="Decrease quantity"
                       >
                         -
                       </button>
-                      <span class="text-white tabular-nums">{{ item.quantity }}</span>
+                      <span class="text-text-main tabular-nums">{{ item.quantity }}</span>
                       <button
                         @click="cartStore.updateQuantity(item.id, item.quantity + 1)"
-                        class="btn-small"
+                        class="btn-small text-text-main hover:text-text-muted"
                         aria-label="Increase quantity"
                       >
                         +
@@ -252,12 +262,12 @@ const handlePlaceOrder = async (e) => {
                   <div class="flex flex-col items-end justify-between">
                     <button
                       @click="cartStore.removeFromCart(item.id)"
-                      class="text-gray-400 hover:text-red-500 transition-colors"
+                      class="text-text-muted hover:text-red-500 transition-colors"
                       aria-label="Remove item"
                     >
                       <Trash2 class="size-5" />
                     </button>
-                    <p class="text-xl text-white tabular-nums">
+                    <p class="text-xl text-text-main tabular-nums">
                       ${{ (item.price * item.quantity).toFixed(2) }}
                     </p>
                   </div>
@@ -266,14 +276,14 @@ const handlePlaceOrder = async (e) => {
 
               <!-- Payment Form -->
               <form v-else @submit="handlePlaceOrder" class="card">
-                <h2 class="text-2xl mb-6 text-white flex items-center gap-2">
+                <h2 class="text-2xl mb-6 text-text-main flex items-center gap-2">
                   <CreditCard class="size-6" />
                   Payment Information
                 </h2>
 
                 <div class="space-y-4">
                   <div>
-                    <label class="block text-gray-400 mb-2">Email</label>
+                    <label class="block text-text-muted mb-2">Email</label>
                     <input
                       type="email"
                       name="email"
@@ -285,7 +295,7 @@ const handlePlaceOrder = async (e) => {
                   </div>
 
                   <div>
-                    <label class="block text-gray-400 mb-2">Full Name</label>
+                    <label class="block text-text-muted mb-2">Full Name</label>
                     <input
                       type="text"
                       name="name"
@@ -297,7 +307,7 @@ const handlePlaceOrder = async (e) => {
                   </div>
 
                   <div>
-                    <label class="block text-gray-400 mb-2">Address</label>
+                    <label class="block text-text-muted mb-2">Address</label>
                     <input
                       type="text"
                       name="address"
@@ -310,7 +320,7 @@ const handlePlaceOrder = async (e) => {
 
                   <div class="grid grid-cols-2 gap-4">
                     <div>
-                      <label class="block text-gray-400 mb-2">City</label>
+                      <label class="block text-text-muted mb-2">City</label>
                       <input
                         type="text"
                         name="city"
@@ -321,7 +331,7 @@ const handlePlaceOrder = async (e) => {
                       />
                     </div>
                     <div>
-                      <label class="block text-gray-400 mb-2">ZIP Code</label>
+                      <label class="block text-text-muted mb-2">ZIP Code</label>
                       <input
                         type="text"
                         name="zipCode"
@@ -335,16 +345,16 @@ const handlePlaceOrder = async (e) => {
 
                   <div class="space-y-4">
                     <!-- Stripe Card Element -->
-                    <div class="p-4 bg-dark-800 border border-dark-700 rounded-lg">
-                      <label class="block text-gray-400 mb-2">Card Details</label>
-                      <div id="card-element" data-testid="card-element" class="p-3 bg-dark-900 border border-dark-700 rounded-md"></div>
+                    <div class="p-4 bg-bg-card border border-border-main rounded-lg">
+                      <label class="block text-text-muted mb-2">Card Details</label>
+                      <div id="card-element" data-testid="card-element" class="p-3 bg-bg-main border border-border-main rounded-md"></div>
                       <div v-if="stripeError" class="mt-2 text-red-500 text-sm">{{ stripeError }}</div>
                     </div>
                   </div>
 
                 </div>
 
-                <div class="mt-6 p-4 bg-dark-900 border border-dark-700 flex items-center gap-2 text-sm text-gray-400">
+                <div class="mt-6 p-4 bg-bg-main border border-border-main flex items-center gap-2 text-sm text-text-muted">
                   <Lock class="size-4" />
                   Your payment information is secure and encrypted
                 </div>
@@ -354,24 +364,24 @@ const handlePlaceOrder = async (e) => {
             <!-- Order Summary -->
             <div>
               <div class="card sticky top-24">
-                <h2 class="text-2xl mb-6 text-white">Order Summary</h2>
+                <h2 class="text-2xl mb-6 text-text-main">Order Summary</h2>
 
-                <div class="space-y-3 mb-6 pb-6 border-b border-dark-700">
-                  <div class="flex justify-between text-gray-400">
+                <div class="space-y-3 mb-6 pb-6 border-b border-border-main">
+                  <div class="flex justify-between text-text-muted">
                     <span>Subtotal</span>
                     <span class="tabular-nums">${{ cartStore.totalPrice.toFixed(2) }}</span>
                   </div>
-                  <div class="flex justify-between text-gray-400">
+                  <div class="flex justify-between text-text-muted">
                     <span>Shipping</span>
                     <span class="tabular-nums">${{ shippingCost.toFixed(2) }}</span>
                   </div>
-                  <div class="flex justify-between text-gray-400">
+                  <div class="flex justify-between text-text-muted">
                     <span>Tax</span>
                     <span class="tabular-nums">${{ tax.toFixed(2) }}</span>
                   </div>
                 </div>
 
-                <div class="flex justify-between text-2xl mb-6 text-white">
+                <div class="flex justify-between text-2xl mb-6 text-text-main">
                   <span>Total</span>
                   <span class="tabular-nums">${{ finalTotal.toFixed(2) }}</span>
                 </div>

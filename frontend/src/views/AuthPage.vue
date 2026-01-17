@@ -41,10 +41,10 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="min-h-dvh py-16 bg-dark-900 flex items-center justify-center">
+  <div class="min-h-dvh py-16 bg-bg-main flex items-center justify-center transition-colors duration-300">
     <div class="container mx-auto px-4">
       <div class="max-w-md mx-auto card">
-        <h1 class="text-3xl mb-6 text-white text-center text-balance">
+        <h1 class="text-3xl mb-6 text-text-main text-center text-balance">
           {{ isLogin ? 'Welcome Back' : 'Create Account' }}
         </h1>
 
@@ -64,9 +64,9 @@ const handleSubmit = async () => {
           
           <!-- Full Name (Signup only) -->
           <div v-if="!isLogin">
-            <label class="block text-gray-400 mb-2">Full Name</label>
+            <label class="block text-text-muted mb-2">Full Name</label>
             <div class="relative">
-              <User class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
+              <User class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-text-muted" />
               <input
                 type="text"
                 v-model="formData.full_name"
@@ -79,9 +79,9 @@ const handleSubmit = async () => {
 
           <!-- Email -->
           <div>
-            <label class="block text-gray-400 mb-2">Email</label>
+            <label class="block text-text-muted mb-2">Email</label>
             <div class="relative">
-              <Mail class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
+              <Mail class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-text-muted" />
               <input
                 type="email"
                 v-model="formData.email"
@@ -94,9 +94,9 @@ const handleSubmit = async () => {
 
           <!-- Password -->
           <div>
-            <label class="block text-gray-400 mb-2">Password</label>
+            <label class="block text-text-muted mb-2">Password</label>
             <div class="relative">
-              <Lock class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-500" />
+              <Lock class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-text-muted" />
               <input
                 type="password"
                 v-model="formData.password"
@@ -112,19 +112,19 @@ const handleSubmit = async () => {
             :disabled="authStore.loading"
             class="btn-primary w-full flex items-center justify-center gap-2"
           >
-            <span v-if="authStore.loading" class="size-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></span>
+            <span v-if="authStore.loading" class="size-4 border-2 border-bg-main/20 border-t-bg-main rounded-full animate-spin"></span>
             {{ isLogin ? 'Log In' : 'Sign Up' }}
           </button>
         </form>
 
-        <div class="mt-6 text-center text-gray-400 text-sm">
+        <div class="mt-6 text-center text-text-muted text-sm">
           <p v-if="isLogin">
             Don't have an account? 
-            <button @click="isLogin = false; authStore.error = null; successMessage = ''" class="text-white hover:underline">Sign up</button>
+            <button @click="isLogin = false; authStore.error = null; successMessage = ''" class="text-text-main hover:underline">Sign up</button>
           </p>
           <p v-else>
             Already have an account? 
-            <button @click="isLogin = true; authStore.error = null; successMessage = ''" class="text-white hover:underline">Log in</button>
+            <button @click="isLogin = true; authStore.error = null; successMessage = ''" class="text-text-main hover:underline">Log in</button>
           </p>
         </div>
 

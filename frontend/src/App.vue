@@ -4,7 +4,7 @@ import Footer from './components/Footer.vue'
 </script>
 
 <template>
-  <div id="app" class="flex flex-col min-h-dvh bg-dark-900 text-primary">
+  <div id="app" class="flex flex-col min-h-dvh bg-bg-main text-text-main">
     <!-- Header (sticky) -->
     <Header />
 
