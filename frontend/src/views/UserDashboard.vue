@@ -224,9 +224,10 @@
                     <button
                       type="submit"
                       :disabled="authStore.loading"
-                      class="btn-primary w-full md:w-auto flex items-center justify-center gap-2"
+                      class="btn btn-primary w-full md:w-auto gap-2"
                     >
                       <span v-if="authStore.loading" class="size-4 border-2 border-bg-main/20 border-t-bg-main rounded-full animate-spin"></span>
+                      <Save v-else class="size-4" />
                       Save Changes
                     </button>
                   </div>
@@ -246,7 +247,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { usersApi } from '../api/client'
-import { ShoppingCart } from 'lucide-vue-next'
+import { ShoppingCart, Save } from 'lucide-vue-next'
 
 const router = useRouter()
 const authStore = useAuthStore()

@@ -60,6 +60,15 @@ export const authApi = {
     method: 'POST',
     body: JSON.stringify(userData),
   }),
+
+  recoverPassword: (email) => apiFetch(`/auth/password-recovery/${email}`, {
+    method: 'POST',
+  }),
+
+  resetPassword: (token, newPassword) => apiFetch('/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify({ token, new_password: newPassword }),
+  }),
 };
 
 // Users API

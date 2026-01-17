@@ -1,31 +1,50 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { Lock, Mail, User, AlertCircle, CheckCircle } from 'lucide-vue-next'
+import { validatePassword } from '../utils/validation'
 
 const router = useRouter()
 const route = useRoute()
 const authStore = useAuthStore()
 
-const isLogin = ref(true) // Toggle between login and signup
+const mode = ref('login') // 'login' | 'signup' | 'recover'
 const successMessage = ref('')
 const formData = ref({
   email: '',
   password: '',
   full_name: ''
 })
+const passwordError = ref('')
+
+// Clear errors when switching modes
+watch(mode, () => {
+  authStore.error = null
+  successMessage.value = ''
+  passwordError.value = ''
+})
+
+const handlePasswordInput = () => {
+  if (mode.value === 'signup') {
+    const { isValid, error } = validatePassword(formData.value.password)
+    passwordError.value = isValid ? '' : error
+  } else {
+    passwordError.value = ''
+  }
+}
 
 const handleSubmit = async () => {
   successMessage.value = ''
-  if (isLogin.value) {
+  if (mode.value === 'login') {
     const success = await authStore.login(formData.value.email, formData.value.password)
     if (success) {
       const redirectPath = route.query.redirect || '/dashboard'
       router.push(redirectPath)
     }
-  } else {
-    // Signup
+  } else if (mode.value === 'signup') {
+    if (passwordError.value) return // Block submission if password invalid
+    
     const success = await authStore.signup({
       email: formData.value.email,
       password: formData.value.password,
@@ -33,10 +52,15 @@ const handleSubmit = async () => {
     })
     
     if (success) {
-      // Switch to login mode and show success message
-      isLogin.value = true
+      mode.value = 'login'
       successMessage.value = 'Account created! Please log in.'
-      formData.value.password = '' // Clear password
+      formData.value.password = '' 
+    }
+  } else if (mode.value === 'recover') {
+    const success = await authStore.recoverPassword(formData.value.email)
+    if (success) {
+      successMessage.value = 'If an account exists, a recovery email has been sent.'
+      formData.value.email = ''
     }
   }
 }
@@ -47,7 +71,7 @@ const handleSubmit = async () => {
     <div class="container mx-auto px-4">
       <div class="max-w-md mx-auto card">
         <h1 class="text-3xl mb-6 text-text-main text-center text-balance">
-          {{ isLogin ? 'Welcome Back' : 'Create Account' }}
+          {{ mode === 'login' ? 'Welcome Back' : mode === 'signup' ? 'Create Account' : 'Reset Password' }}
         </h1>
 
         <!-- Error Alert -->
@@ -65,7 +89,7 @@ const handleSubmit = async () => {
         <form @submit.prevent="handleSubmit" class="space-y-4">
           
           <!-- Full Name (Signup only) -->
-          <div v-if="!isLogin">
+          <div v-if="mode === 'signup'">
             <label class="block text-text-muted mb-2">Full Name</label>
             <div class="relative">
               <User class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-text-muted" />
@@ -94,8 +118,8 @@ const handleSubmit = async () => {
             </div>
           </div>
 
-          <!-- Password -->
-          <div>
+          <!-- Password (Login and Signup only) -->
+          <div v-if="mode !== 'recover'">
             <label class="block text-text-muted mb-2">Password</label>
             <div class="relative">
               <Lock class="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-text-muted" />
@@ -103,10 +127,13 @@ const handleSubmit = async () => {
                 type="password"
                 v-model="formData.password"
                 required
-                class="input pl-10"
+                @input="handlePasswordInput"
+                class="input pl-10 transition-colors"
+                :class="{ 'border-red-500 focus:border-red-500 focus:ring-red-500/20': passwordError }"
                 placeholder="••••••••"
               />
             </div>
+            <p v-if="passwordError" class="mt-1 text-sm text-red-500">{{ passwordError }}</p>
           </div>
 
           <button
@@ -115,19 +142,31 @@ const handleSubmit = async () => {
             class="btn-primary w-full flex items-center justify-center gap-2"
           >
             <span v-if="authStore.loading" class="size-4 border-2 border-bg-main/20 border-t-bg-main rounded-full animate-spin"></span>
-            {{ isLogin ? 'Log In' : 'Sign Up' }}
+            {{ mode === 'login' ? 'Log In' : mode === 'signup' ? 'Sign Up' : 'Send Reset Link' }}
           </button>
         </form>
 
-        <div class="mt-6 text-center text-text-muted text-sm">
-          <p v-if="isLogin">
-            Don't have an account? 
-            <button @click="isLogin = false; authStore.error = null; successMessage = ''" class="text-text-main hover:underline">Sign up</button>
-          </p>
-          <p v-else>
-            Already have an account? 
-            <button @click="isLogin = true; authStore.error = null; successMessage = ''" class="text-text-main hover:underline">Log in</button>
-          </p>
+        <div class="mt-6 text-center text-text-muted text-sm space-y-2">
+          <div v-if="mode === 'login'">
+            <button @click="mode = 'recover'" class="text-text-muted hover:text-text-main hover:underline block mx-auto mb-4">
+              Forgot your password?
+            </button>
+            <p>
+              Don't have an account? 
+              <button @click="mode = 'signup'" class="text-text-main hover:underline">Sign up</button>
+            </p>
+          </div>
+          
+          <div v-if="mode === 'signup'">
+            <p>
+              Already have an account? 
+              <button @click="mode = 'login'" class="text-text-main hover:underline">Log in</button>
+            </p>
+          </div>
+
+          <div v-if="mode === 'recover'">
+            <button @click="mode = 'login'" class="text-text-main hover:underline">Back to Login</button>
+          </div>
         </div>
 
       </div>

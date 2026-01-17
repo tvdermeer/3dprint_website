@@ -31,6 +31,12 @@ const routes = [
     meta: { guest: true } 
   },
   {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('../views/ResetPasswordPage.vue'),
+    meta: { guest: true }
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
     component: UserDashboard,

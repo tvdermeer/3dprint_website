@@ -1,0 +1,115 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "AXYS" [ref=e6] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8]: AXYS
+        - navigation [ref=e9]:
+          - link "Home" [ref=e10] [cursor=pointer]:
+            - /url: /
+          - link "Product" [ref=e11] [cursor=pointer]:
+            - /url: /product
+        - generic [ref=e12]:
+          - button "Toggle Theme" [ref=e13]:
+            - img [ref=e14]
+          - link "Login" [ref=e20] [cursor=pointer]:
+            - /url: /login
+            - img [ref=e21]
+          - link "View Cart" [ref=e24] [cursor=pointer]:
+            - /url: /checkout
+            - img [ref=e25]
+            - generic [ref=e29]: "1"
+    - main [ref=e30]:
+      - generic [ref=e34]:
+        - link "Continue Shopping" [ref=e36] [cursor=pointer]:
+          - /url: /product
+          - img [ref=e37]
+          - text: Continue Shopping
+        - heading "Checkout" [level=1] [ref=e39]
+        - generic [ref=e40]:
+          - generic [ref=e42]:
+            - heading "Payment Information" [level=2] [ref=e43]:
+              - img [ref=e44]
+              - text: Payment Information
+            - generic [ref=e46]:
+              - generic [ref=e47]:
+                - generic [ref=e48]: Email
+                - textbox "your@email.com" [ref=e49]: test@example.com
+              - generic [ref=e50]:
+                - generic [ref=e51]: Full Name
+                - textbox "John Doe" [ref=e52]: Test User
+              - generic [ref=e53]:
+                - generic [ref=e54]: Address
+                - textbox "123 Main St" [ref=e55]: 123 Test St
+              - generic [ref=e56]:
+                - generic [ref=e57]:
+                  - generic [ref=e58]: City
+                  - textbox "New York" [ref=e59]: Test City
+                - generic [ref=e60]:
+                  - generic [ref=e61]: ZIP Code
+                  - textbox "10001" [ref=e62]: "12345"
+              - generic [ref=e64]:
+                - generic [ref=e65]: Card Details
+                - generic [ref=e67]: Cannot read properties of null (reading 'confirmCardPayment')
+            - generic [ref=e68]:
+              - img [ref=e69]
+              - text: Your payment information is secure and encrypted
+          - generic [ref=e73]:
+            - heading "Order Summary" [level=2] [ref=e74]
+            - generic [ref=e75]:
+              - generic [ref=e76]:
+                - generic [ref=e77]: Subtotal
+                - generic [ref=e78]: $39.99
+              - generic [ref=e79]:
+                - generic [ref=e80]: Shipping
+                - generic [ref=e81]: $9.99
+              - generic [ref=e82]:
+                - generic [ref=e83]: Tax
+                - generic [ref=e84]: $3.20
+            - generic [ref=e85]:
+              - generic [ref=e86]: Total
+              - generic [ref=e87]: $53.18
+            - button "Place Order" [active] [ref=e88]
+    - contentinfo [ref=e89]:
+      - generic [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]:
+            - heading "AXYS" [level=3] [ref=e93]
+            - paragraph [ref=e94]: Premium golf club cleaning solution. Precision clean, flawless play.
+          - generic [ref=e95]:
+            - heading "Quick Links" [level=4] [ref=e96]
+            - list [ref=e97]:
+              - listitem [ref=e98]:
+                - link "Home" [ref=e99] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e100]:
+                - link "Product" [ref=e101] [cursor=pointer]:
+                  - /url: /product
+              - listitem [ref=e102]:
+                - link "Checkout" [ref=e103] [cursor=pointer]:
+                  - /url: /checkout
+          - generic [ref=e104]:
+            - heading "Support" [level=4] [ref=e105]
+            - list [ref=e106]:
+              - listitem [ref=e107]:
+                - link "support@axys.com" [ref=e108] [cursor=pointer]:
+                  - /url: mailto:support@axys.com
+              - listitem [ref=e109]:
+                - paragraph [ref=e110]: 1-800-AXYS-CLEAN
+        - generic [ref=e111]:
+          - paragraph [ref=e112]: © 2026 AXYS. All rights reserved.
+          - generic [ref=e113]:
+            - link "Privacy Policy" [ref=e114] [cursor=pointer]:
+              - /url: "#"
+            - link "Terms of Service" [ref=e115] [cursor=pointer]:
+              - /url: "#"
+  - generic [ref=e116]:
+    - generic "Toggle devtools panel" [ref=e117] [cursor=pointer]:
+      - img [ref=e118]
+    - generic "Toggle Component Inspector" [ref=e123] [cursor=pointer]:
+      - img [ref=e124]
+```

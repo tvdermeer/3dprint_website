@@ -88,6 +88,36 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  const recoverPassword = async (email) => {
+    loading.value = true
+    error.value = null
+    try {
+      await authApi.recoverPassword(email)
+      return true
+    } catch (err) {
+      console.error('Password recovery failed:', err)
+      error.value = err.message || 'Password recovery failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const resetPassword = async (token, newPassword) => {
+    loading.value = true
+    error.value = null
+    try {
+      await authApi.resetPassword(token, newPassword)
+      return true
+    } catch (err) {
+      console.error('Password reset failed:', err)
+      error.value = err.message || 'Password reset failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   const logout = () => {
     token.value = null
     user.value = null
@@ -110,6 +140,8 @@ export const useAuthStore = defineStore('auth', () => {
     signup,
     logout,
     fetchUser,
-    updateProfile
+    updateProfile,
+    recoverPassword,
+    resetPassword
   }
 })
