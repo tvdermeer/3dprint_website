@@ -39,7 +39,7 @@ const handleAddToCart = () => {
 
 <template>
   <div class="min-h-dvh py-16 bg-bg-main transition-colors duration-300">
-    <div class="container mx-auto">
+    <div class="container mx-auto px-4 md:px-6">
       <div class="grid md:grid-cols-2 gap-12 mb-16">
         <!-- Product Image -->
         <div class="bg-bg-card p-12 flex items-center justify-center border border-border-main h-96 transition-colors duration-300">

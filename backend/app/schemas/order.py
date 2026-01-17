@@ -13,7 +13,9 @@ class OrderItemBase(BaseModel):
 
     product_id: int = Field(..., description="ID of the product purchased")
     quantity: int = Field(..., gt=0, description="Quantity purchased")
-    price_at_purchase: float = Field(..., gt=0, description="Price per unit at time of purchase")
+    price_at_purchase: float = Field(
+        ..., gt=0, description="Price per unit at time of purchase"
+    )
 
 
 class OrderItemCreate(OrderItemBase):
@@ -38,7 +40,9 @@ class OrderBase(BaseModel):
     """Base order schema with common fields."""
 
     customer_email: EmailStr = Field(..., description="Customer email address")
-    customer_name: str = Field(..., min_length=1, max_length=255, description="Customer name")
+    customer_name: str = Field(
+        ..., min_length=1, max_length=255, description="Customer name"
+    )
     total_amount: float = Field(..., gt=0, description="Order total in USD")
 
 
@@ -47,14 +51,18 @@ class OrderCreate(OrderBase):
 
     status: str = Field(default="pending", description="Initial order status")
     items: List[OrderItemCreate] = Field(..., description="List of items in the order")
-    stripe_payment_id: Optional[str] = Field(None, description="Stripe payment intent ID")
+    stripe_payment_id: Optional[str] = Field(
+        None, description="Stripe payment intent ID"
+    )
 
 
 class OrderUpdate(BaseModel):
     """Schema for updating an existing order."""
 
     status: Optional[str] = Field(None, description="Order status")
-    stripe_payment_id: Optional[str] = Field(None, description="Stripe payment intent ID")
+    stripe_payment_id: Optional[str] = Field(
+        None, description="Stripe payment intent ID"
+    )
 
 
 class OrderResponse(OrderBase):
@@ -64,9 +72,14 @@ class OrderResponse(OrderBase):
     order_number: str = Field(..., description="Human-readable order number")
     status: str = Field(..., description="Current order status")
     stripe_payment_id: Optional[str] = Field(None, description="Stripe payment ID")
+    user_id: Optional[int] = Field(
+        None, description="ID of the user who made the order"
+    )
     created_at: datetime = Field(..., description="Order creation timestamp")
     updated_at: datetime = Field(..., description="Last update timestamp")
-    items: List[OrderItemResponse] = Field(default=[], description="List of items in the order")
+    items: List[OrderItemResponse] = Field(
+        default=[], description="List of items in the order"
+    )
 
     class Config:
         """Pydantic config."""

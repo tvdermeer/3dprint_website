@@ -1,10 +1,11 @@
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { Lock, Mail, User, AlertCircle, CheckCircle } from 'lucide-vue-next'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const isLogin = ref(true) // Toggle between login and signup
@@ -20,7 +21,8 @@ const handleSubmit = async () => {
   if (isLogin.value) {
     const success = await authStore.login(formData.value.email, formData.value.password)
     if (success) {
-      router.push('/')
+      const redirectPath = route.query.redirect || '/dashboard'
+      router.push(redirectPath)
     }
   } else {
     // Signup

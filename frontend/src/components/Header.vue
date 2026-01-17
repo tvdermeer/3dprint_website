@@ -16,7 +16,7 @@ const totalItems = computed(() => cartStore.totalItems)
 
 <template>
   <header class="bg-bg-main border-b border-border-main sticky top-0 z-50 transition-colors duration-300">
-    <div class="container flex items-center justify-between h-20">
+    <div class="container mx-auto px-4 md:px-6 flex items-center justify-between h-20">
       <!-- Logo (Left) -->
       <RouterLink to="/" class="flex items-center gap-2">
         <div class="size-12 bg-bg-card flex items-center justify-center">
@@ -56,7 +56,10 @@ const totalItems = computed(() => cartStore.totalItems)
 
         <!-- Auth Links -->
         <div v-if="authStore.isAuthenticated" class="flex items-center gap-4">
-          <span class="text-sm text-text-muted hidden sm:block">{{ authStore.user?.email }}</span>
+          <RouterLink to="/dashboard" class="flex items-center gap-2 text-text-muted hover:text-text-main transition-colors">
+             <User class="size-5" />
+             <span class="text-sm hidden sm:block">{{ authStore.user?.full_name || 'My Account' }}</span>
+          </RouterLink>
           <button @click="authStore.logout" class="text-text-muted hover:text-text-main transition-colors" aria-label="Logout">
             <LogOut class="size-5" />
           </button>

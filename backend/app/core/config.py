@@ -33,9 +33,9 @@ class Settings(BaseSettings):
     ]
 
     # Stripe configuration (optional)
-    stripe_secret_key: str
-    stripe_publishable_key: str 
-    stripe_webhook_secret: str 
+    stripe_secret_key: str = ""
+    stripe_publishable_key: str = ""
+    stripe_webhook_secret: str = ""
 
     class Config:
         """Pydantic config."""

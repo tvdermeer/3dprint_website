@@ -4,7 +4,7 @@ const currentYear = new Date().getFullYear()
 
 <template>
   <footer class="bg-bg-main border-t border-border-main mt-16 md:mt-24 transition-colors duration-300">
-    <div class="container py-8 md:py-12">
+    <div class="container mx-auto px-4 md:px-6 py-8 md:py-12">
       <div class="grid md:grid-cols-3 gap-8 mb-8 pb-8 border-b border-border-main">
         <!-- Brand Section -->
         <div>

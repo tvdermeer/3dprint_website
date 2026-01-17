@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { authApi } from '../api/client'
+import { authApi, usersApi } from '../api/client'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -13,6 +13,41 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value)
 
   // Actions
+  const fetchUser = async () => {
+    if (!token.value) return null
+    
+    try {
+      const userData = await usersApi.getMe(token.value)
+      user.value = userData
+      localStorage.setItem('axys-user', JSON.stringify(userData))
+      return userData
+    } catch (err) {
+      console.error('Failed to fetch user profile:', err)
+      // If 401, clear session
+      if (err.message.includes('401') || err.message.includes('Unauthorized')) {
+        logout()
+      }
+      return null
+    }
+  }
+
+  const updateProfile = async (userData) => {
+    loading.value = true
+    error.value = null
+    try {
+      const updatedUser = await usersApi.updateProfile(token.value, userData)
+      user.value = updatedUser
+      localStorage.setItem('axys-user', JSON.stringify(updatedUser))
+      return true
+    } catch (err) {
+      console.error('Update failed:', err)
+      error.value = err.message || 'Update failed'
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   const login = async (email, password) => {
     loading.value = true
     error.value = null
@@ -23,11 +58,8 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = data.access_token
       localStorage.setItem('axys-token', data.access_token)
       
-      // In a real app, we might fetch user profile here
-      // For now, we'll simulate a user object
-      const userData = { email }
-      user.value = userData
-      localStorage.setItem('axys-user', JSON.stringify(userData))
+      // Fetch user profile
+      await fetchUser()
       
       return true
     } catch (err) {
@@ -76,6 +108,8 @@ export const useAuthStore = defineStore('auth', () => {
     // Actions
     login,
     signup,
-    logout
+    logout,
+    fetchUser,
+    updateProfile
   }
 })

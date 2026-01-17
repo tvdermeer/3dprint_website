@@ -22,11 +22,17 @@ class Order(Base):
         String(50), default="pending"
     )  # pending, paid, shipped, delivered, cancelled
     stripe_payment_id = Column(String(255), nullable=True, unique=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime, default=func.now(), nullable=False)
-    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
+    updated_at = Column(
+        DateTime, default=func.now(), onupdate=func.now(), nullable=False
+    )
 
     # Relationship to items
-    items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
+    items = relationship(
+        "OrderItem", back_populates="order", cascade="all, delete-orphan"
+    )
+    user = relationship("app.models.user.User", back_populates="orders")
 
     def __repr__(self) -> str:
         return f"<Order(id={self.id}, order_number={self.order_number}, status={self.status})>"

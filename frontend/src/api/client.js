@@ -62,6 +62,29 @@ export const authApi = {
   }),
 };
 
+// Users API
+export const usersApi = {
+  getMe: (token) => apiFetch('/users/me', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }),
+  
+  getOrders: (token) => apiFetch('/users/me/orders', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }),
+
+  updateProfile: (token, userData) => apiFetch('/users/me', {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(userData)
+  }),
+};
+
 // Products API
 export const productsApi = {
   getAll: (params) => {

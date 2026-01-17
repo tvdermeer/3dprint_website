@@ -24,7 +24,9 @@ class OrderService:
         return f"ORD-{timestamp}-{unique_id}"
 
     @staticmethod
-    def create_order(db: Session, order: OrderCreate) -> Order:
+    def create_order(
+        db: Session, order: OrderCreate, user_id: Optional[int] = None
+    ) -> Order:
         """Create a new order with items."""
         # Create the order
         db_order = Order(
@@ -34,6 +36,7 @@ class OrderService:
             total_amount=order.total_amount,
             status=order.status,
             stripe_payment_id=order.stripe_payment_id,
+            user_id=user_id,
         )
         db.add(db_order)
         db.flush()  # Flush to get the ID for the order
@@ -63,9 +66,9 @@ class OrderService:
         return db.query(Order).filter(Order.order_number == order_number).first()
 
     @staticmethod
-    def get_orders_by_email(db: Session, email: str, skip: int = 0, limit: int = 50) -> list[
-        Order
-    ]:
+    def get_orders_by_email(
+        db: Session, email: str, skip: int = 0, limit: int = 50
+    ) -> list[Order]:
         """Get all orders for a customer email."""
         return (
             db.query(Order)
@@ -77,7 +80,23 @@ class OrderService:
         )
 
     @staticmethod
-    def update_order_status(db: Session, order_id: int, new_status: str) -> Optional[Order]:
+    def get_orders_by_user_id(
+        db: Session, user_id: int, skip: int = 0, limit: int = 50
+    ) -> list[Order]:
+        """Get all orders for a specific user ID."""
+        return (
+            db.query(Order)
+            .filter(Order.user_id == user_id)
+            .order_by(Order.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+    @staticmethod
+    def update_order_status(
+        db: Session, order_id: int, new_status: str
+    ) -> Optional[Order]:
         """Update order status."""
         db_order = db.query(Order).filter(Order.id == order_id).first()
         if not db_order:
@@ -89,7 +108,9 @@ class OrderService:
         return db_order
 
     @staticmethod
-    def update_order(db: Session, order_id: int, order_update: OrderUpdate) -> Optional[Order]:
+    def update_order(
+        db: Session, order_id: int, order_update: OrderUpdate
+    ) -> Optional[Order]:
         """Update an order."""
         db_order = db.query(Order).filter(Order.id == order_id).first()
         if not db_order:
@@ -106,10 +127,18 @@ class OrderService:
     @staticmethod
     def get_all_orders(db: Session, skip: int = 0, limit: int = 100) -> list[Order]:
         """Get all orders with pagination."""
-        return db.query(Order).order_by(Order.created_at.desc()).offset(skip).limit(limit).all()
+        return (
+            db.query(Order)
+            .order_by(Order.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     @staticmethod
-    def update_order_status_by_payment_id(db: Session, payment_id: str, new_status: str) -> Optional[Order]:
+    def update_order_status_by_payment_id(
+        db: Session, payment_id: str, new_status: str
+    ) -> Optional[Order]:
         """Update order status by Stripe payment ID."""
         db_order = db.query(Order).filter(Order.stripe_payment_id == payment_id).first()
         if not db_order:

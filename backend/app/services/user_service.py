@@ -41,3 +41,19 @@ class UserService:
         if not verify_password(password, user.hashed_password):
             return None
         return user
+
+    @staticmethod
+    def update_user(db: Session, db_user: User, user_in: UserUpdate) -> User:
+        update_data = user_in.model_dump(exclude_unset=True)
+        if update_data.get("password"):
+            hashed_password = hash_password(update_data["password"])
+            del update_data["password"]
+            update_data["hashed_password"] = hashed_password
+
+        for field, value in update_data.items():
+            setattr(db_user, field, value)
+
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        return db_user
