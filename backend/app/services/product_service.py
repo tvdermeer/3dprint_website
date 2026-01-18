@@ -16,7 +16,13 @@ class ProductService:
     @staticmethod
     def get_all_products(db: Session, skip: int = 0, limit: int = 100) -> List[Product]:
         """Get all active products with pagination."""
-        return db.query(Product).filter(Product.is_active == 1).offset(skip).limit(limit).all()
+        return (
+            db.query(Product)
+            .filter(Product.is_active == 1)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
 
     @staticmethod
     def get_product_by_id(db: Session, product_id: int) -> Optional[Product]:
@@ -46,9 +52,9 @@ class ProductService:
         return db_product
 
     @staticmethod
-    def update_product(db: Session, product_id: int, product_update: ProductUpdate) -> Optional[
-        Product
-    ]:
+    def update_product(
+        db: Session, product_id: int, product_update: ProductUpdate
+    ) -> Optional[Product]:
         """Update an existing product."""
         db_product = db.query(Product).filter(Product.id == product_id).first()
         if not db_product:

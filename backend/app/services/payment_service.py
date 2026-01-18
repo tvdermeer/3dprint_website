@@ -2,7 +2,9 @@
 Payment service handling Stripe integration.
 """
 
+from typing import Any
 import stripe
+import stripe.error
 from fastapi import HTTPException
 
 from app.core.config import settings
@@ -13,21 +15,21 @@ stripe.api_key = settings.stripe_secret_key
 
 class PaymentService:
     @staticmethod
-    def create_payment_intent(amount: float, currency: str = "usd") -> dict:
+    def create_payment_intent(amount: float, currency: str = "usd") -> Any:
         """
         Create a Stripe PaymentIntent.
-        
+
         Args:
             amount: Amount in dollars (will be converted to cents)
             currency: Currency code (default: usd)
-            
+
         Returns:
             dict: PaymentIntent object from Stripe
         """
         try:
             # Convert to cents
             amount_cents = int(amount * 100)
-            
+
             intent = stripe.PaymentIntent.create(
                 amount=amount_cents,
                 currency=currency,

@@ -11,11 +11,17 @@ class ProductBase(BaseModel):
     """Base product schema with common fields."""
 
     name: str = Field(..., min_length=1, max_length=255, description="Product name")
-    description: Optional[str] = Field(None, max_length=2000, description="Product description")
+    description: Optional[str] = Field(
+        None, max_length=2000, description="Product description"
+    )
     price: float = Field(..., gt=0, description="Product price in USD")
     stock: int = Field(default=0, ge=0, description="Available stock quantity")
-    sku: str = Field(..., min_length=1, max_length=100, description="Stock keeping unit")
-    image_url: Optional[str] = Field(None, max_length=500, description="Product image URL")
+    sku: str = Field(
+        ..., min_length=1, max_length=100, description="Stock keeping unit"
+    )
+    image_url: Optional[str] = Field(
+        None, max_length=500, description="Product image URL"
+    )
     is_active: bool = Field(default=True, description="Whether product is active")
 
 

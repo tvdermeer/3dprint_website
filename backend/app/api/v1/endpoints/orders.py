@@ -2,7 +2,7 @@
 Order API endpoints.
 """
 
-from typing import List
+from typing import List, Optional, cast
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -13,7 +13,6 @@ from app.services.order_service import OrderService
 from app.services.product_service import ProductService
 from app.api import deps
 from app.models.user import User
-from typing import Optional
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -33,7 +32,7 @@ def list_orders(
     if limit > 100:
         limit = 100
     orders = OrderService.get_all_orders(db, skip=skip, limit=limit)
-    return orders
+    return [OrderResponse.model_validate(o) for o in orders]
 
 
 @router.get("/{order_id}", response_model=OrderResponse)
@@ -73,7 +72,7 @@ def get_customer_orders(
     if limit > 100:
         limit = 100
     orders = OrderService.get_orders_by_email(db, email, skip=skip, limit=limit)
-    return orders
+    return [OrderResponse.model_validate(o) for o in orders]
 
 
 @router.post("/", response_model=OrderResponse, status_code=status.HTTP_201_CREATED)
@@ -83,7 +82,7 @@ def create_order(
     current_user: Optional[User] = Depends(deps.get_current_user_optional),
 ) -> OrderResponse:
     """Create a new order."""
-    user_id = current_user.id if current_user else None
+    user_id = cast(int, current_user.id) if current_user else None
     new_order = OrderService.create_order(db, order, user_id=user_id)
     return new_order
 

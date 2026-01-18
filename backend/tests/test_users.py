@@ -4,7 +4,7 @@ from fastapi.testclient import TestClient
 def test_get_users_me(client: TestClient) -> None:
     # 1. Signup
     email = "test_me@example.com"
-    password = "password123"
+    password = "Password123!"
     client.post(
         "/api/v1/auth/signup",
         json={"email": email, "password": password, "full_name": "Test User"},

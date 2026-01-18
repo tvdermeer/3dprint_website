@@ -29,7 +29,7 @@ def list_products(
     if limit > 100:
         limit = 100
     products = ProductService.get_all_products(db, skip=skip, limit=limit)
-    return products
+    return [ProductResponse.model_validate(p) for p in products]
 
 
 @router.get("/{product_id}", response_model=ProductResponse)

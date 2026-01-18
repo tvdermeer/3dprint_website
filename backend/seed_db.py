@@ -3,6 +3,7 @@ from app.models.product import Product
 from app.services.product_service import ProductService
 from app.schemas.product import ProductCreate
 
+
 def seed():
     db = SessionLocal()
     try:
@@ -16,9 +17,9 @@ def seed():
                 stock=100,
                 sku="AXYS-GC-001",
                 image_url=None,  # Placeholder for now
-                is_active=1
+                is_active=True,
             )
-            
+
             ProductService.create_product(db, product_data)
             print("Product created successfully!")
         else:
@@ -27,6 +28,7 @@ def seed():
         print(f"Error seeding database: {e}")
     finally:
         db.close()
+
 
 if __name__ == "__main__":
     seed()

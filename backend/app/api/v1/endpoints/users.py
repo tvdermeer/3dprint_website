@@ -2,7 +2,7 @@
 User API endpoints.
 """
 
-from typing import Any, List
+from typing import Any, List, cast
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -39,7 +39,7 @@ def read_user_orders(
     Get current user's orders.
     """
     return OrderService.get_orders_by_user_id(
-        db, user_id=current_user.id, skip=skip, limit=limit
+        db, user_id=cast(int, current_user.id), skip=skip, limit=limit
     )
 
 

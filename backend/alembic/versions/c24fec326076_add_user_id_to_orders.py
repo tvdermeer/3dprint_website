@@ -34,11 +34,13 @@ def upgrade() -> None:
 
     # 3. Data Migration: Link existing orders to users based on email
     # This raw SQL works for SQLite and most standard SQL DBs
-    op.execute("""
+    op.execute(
+        """
         UPDATE orders 
         SET user_id = (SELECT id FROM users WHERE users.email = orders.customer_email)
         WHERE user_id IS NULL
-    """)
+    """
+    )
 
 
 def downgrade() -> None:

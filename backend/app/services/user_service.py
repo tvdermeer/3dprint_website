@@ -38,7 +38,7 @@ class UserService:
             return None
         from app.core.security import verify_password
 
-        if not verify_password(password, user.hashed_password):
+        if not verify_password(password, str(user.hashed_password)):
             return None
         return user
 

@@ -6,7 +6,7 @@ from app.core.config import settings
 def test_create_order_with_user(client: TestClient) -> None:
     # 1. Signup and Login
     email = "order_user@example.com"
-    password = "password123"
+    password = "Password123!"
     client.post(
         "/api/v1/auth/signup",
         json={"email": email, "password": password, "full_name": "Order User"},

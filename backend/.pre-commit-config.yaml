@@ -1,0 +1,29 @@
+repos:
+  # Ruff format - code formatting
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.13
+    hooks:
+      - id: ruff-format
+        name: ruff format
+        language_version: python3.10
+
+  # Ty - type checking
+  - repo: local
+    hooks:
+      - id: ty
+        name: ty check
+        entry: ty check .
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  # Pytest - run tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [commit]
