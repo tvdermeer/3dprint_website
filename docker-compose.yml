@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: 
+      context: ./backend
+    container_name: 3dprint-backend
+    volumes:
+      # Mount the database file from the host to persist data
+      - ./ecommerce.db:/app/ecommerce.db
+    environment:
+      - DATABASE_URL=sqlite:///./ecommerce.db
+      # Add other environment variables here or use env_file: .env
+      - ALLOWED_ORIGINS=http://localhost,http://localhost:8080
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: 3dprint-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
